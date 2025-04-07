@@ -38,11 +38,11 @@ export async function GET(): Promise<Response> {
     },
   });
 
-  const result: CrewResponse[] = crews.map((crew: any) => {
-    const records = crew.recordsAsCrew.map((rc: any) => rc.record);
+  const result: CrewResponse[] = crews.map((crew) => {
+    const records = crew.recordsAsCrew.map((rc) => rc.record);
     const totalNumberOfOperations = records.length;
-    const totalEmergencyCases = records.filter((r: any) => r.operationType === "EMERGENCY").length;
-    const totalTransportCases = records.filter((r: any) => r.operationType === "TRANSPORT").length;
+    const totalEmergencyCases = records.filter((r) => r.operationType === "EMERGENCY").length;
+    const totalTransportCases = records.filter((r) => r.operationType === "TRANSPORT").length;
 
     return {
       id: crew.id,
@@ -50,7 +50,7 @@ export async function GET(): Promise<Response> {
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
-      records: records.map((r: any) => ({
+      records: records.map((r) => ({
         operationType: r.operationType,
         date: r.date.toISOString(),
       })),
