@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
+import type { Configuration } from "webpack";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  webpack: (config: Configuration) => {
+    if (config.resolve && config.resolve.alias) {
+      config.resolve.alias['@'] = path.resolve(__dirname, 'src');
+    } else if (config.resolve) {
+      config.resolve.alias = {
+        '@': path.resolve(__dirname, 'src'),
+      };
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {
@@ -14,15 +25,13 @@ const nextConfig: NextConfig = {
     ],
   },
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: "3mb" //WILL ADJUST THIS TO CHOOSE API OR SERVER ACTIONS IN HANDLING FORMS
-    }
-  }
+      bodySizeLimit: "3mb",
+    },
+  },
 };
 
 export default nextConfig;
