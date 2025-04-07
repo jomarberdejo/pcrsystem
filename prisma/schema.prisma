@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OperationType {
+  EMERGENCY
+  TRANSPORT
+}
+
+model Personnel {
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String
+  role            PersonnelRole
+  recordsAsDriver Record[]      @relation("DriverRecords")
+  recordsAsCrew   RecordCrew[]  @relation("CrewRecords")
+}
+
+enum PersonnelRole {
+  DRIVER
+  CREW
+  BOTH
+}
+
+model Record {
+  id                String        @id @default(uuid()) @db.Uuid
+  date              DateTime
+  timeCalled        String
+  timeDispatched    String
+  timeAtScene       String
+  timeTransport     String
+  timeEndorsed      String
+  timeArrivedAt     String
+  typeOfIncident    String
+  placeOfIncident   String
+  receivingFacility String
+  typeOfConduction  String
+  vehiclesInvolved  String?
+  chiefComplaint    String
+  noOfCasualty      String
+  remarks           String
+  vehicleUsed       String
+  documentation     Json          @db.JsonB
+  operationType     OperationType
+  ambulanceDriverId String?       @db.Uuid
+  ambulanceDriver   Personnel?    @relation("DriverRecords", fields: [ambulanceDriverId], references: [id], onDelete: SetNull)
+  ambulanceCrews    RecordCrew[]
+}
+
+model RecordCrew {
+  id       String    @id @default(uuid()) @db.Uuid
+  recordId String    @db.Uuid
+  crewId   String    @db.Uuid
+  record   Record    @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  crew     Personnel @relation("CrewRecords", fields: [crewId], references: [id], onDelete: Cascade)
+
+  @@unique([recordId, crewId])
+}
+
+model Admin {
+  id          String    @id @default(uuid()) @db.Uuid
+  username    String    @unique
+  password    String
+  dateCreated DateTime  @default(now())
+  sessions    Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  user         Admin    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  expires      DateTime
+  createdAt    DateTime @default(now())
+}
+
+// enum CustomOptionType {
+//   EMERGENCY
+//   TRANSPORT
+// }
+
+// model CustomOption {
+//   id        Int              @id @default(autoincrement())
+//   category  String
+//   value     String
+//   type      CustomOptionType
+//   createdAt DateTime         @default(now())
+// }

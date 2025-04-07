@@ -1,0 +1,173 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { PCRReportType } from "@/types";
+import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+export const columns: ColumnDef<PCRReportType>[] = [
+  // {
+  //   accessorKey: "id",
+  //   header: "PCR Case ID",
+  //   size: 100,
+  // },
+  {
+    accessorKey: "operationType",
+    header: "Operation Type",
+    cell: ({ row }) => {
+      const type = row?.original.operationType;
+      return (
+        <span
+          className={`px-2 py-1 text-sm font-semibold rounded-md ${
+            type === "TRANSPORT"
+              ? "bg-blue-200 text-blue-800"
+              : "bg-red-200 text-red-800"
+          }`}
+        >
+          {type?.charAt(0).toUpperCase() + type.slice(1)}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    size: 100,
+  },
+  {
+    accessorKey: "timeCalled",
+    header: "Time Called",
+    size: 100,
+  },
+  {
+    accessorKey: "timeDispatched",
+    header: "Time of ERT Dispatched",
+    size: 100,
+  },
+  {
+    accessorKey: "timeAtScene",
+    header: "Time at Scene",
+    size: 100,
+  },
+  {
+    accessorKey: "timeTransport",
+    header: "Time of Transport",
+    size: 100,
+  },
+  {
+    accessorKey: "timeEndorsed",
+    header: "Time Endorsed",
+  },
+  {
+    accessorKey: "timeArrivedAt",
+    header: "Time Arrived At Opcen",
+  },
+  {
+    accessorKey: "typeOfIncident",
+    header: "Type of Incident",
+  },
+  {
+    accessorKey: "placeOfIncident",
+    header: "Place of Incident",
+  },
+  {
+    accessorKey: "receivingFacility",
+    header: "Receiving Facility",
+  },
+  {
+    accessorKey: "typeOfConduction",
+    header: "Type of Conduction",
+  },
+  {
+    accessorKey: "vehiclesInvolved",
+    header: "Vehicles Involved",
+  },
+  {
+    accessorKey: "chiefComplaint",
+    header: "Chief Complaint",
+    size: 300,
+  },
+  {
+    accessorKey: "noOfCasualty",
+    header: "Number of Casualties",
+  },
+  {
+    accessorKey: "remarks",
+    header: "Remarks",
+    size: 300,
+  },
+  {
+    accessorKey: "vehicleUsed",
+    header: "Vehicle Used",
+  },
+  {
+    accessorKey: "ambulanceDriver",
+    header: "Ambulance Driver",
+  },
+  {
+    accessorKey: "ambulanceCrews",
+    header: "Ambulance Crews",
+  },
+  {
+    accessorKey: "computationCallToOpcen",
+    header: "Call Received to Arrival at Opcen",
+  },
+  {
+    accessorKey: "computationERTDispatch",
+    header: "ERT Dispatch to Arrival at Opcen",
+  },
+  {
+    accessorKey: "documentation",
+    header: "Documentation",
+    cell: ({ row }) => (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Image
+            alt="image-identity"
+            width={400}
+            height={400}
+            src={`${row.original.documentation[0]}`}
+            loading="lazy"
+            className="rounded-full h-[60px] w-[60px] object-cover cursor-pointer"
+          />
+        </DialogTrigger>
+        <DialogContent className="h-auto max-h-[80vh] max-w-3xl flex flex-col items-center justify-center py-6 px-4 gap-4">
+          <DialogHeader className="text-center w-full">
+            <DialogTitle>{`Documentation (${row.original.documentation.length} Files) - ${row.original.date}`}</DialogTitle>
+          </DialogHeader>
+          <Carousel className="w-full max-w-2xl mx-auto">
+            <CarouselContent>
+              {row.original.documentation.map((url, i) => (
+                <CarouselItem key={i} className="flex justify-center">
+                  <div className="p-2 flex justify-center">
+                    <Image
+                      alt={`Documentation ${i + 1}`}
+                      height={600}
+                      width={600}
+                      src={url}
+                      loading="lazy"
+                      className="max-w-full max-h-[70vh] object-contain"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </DialogContent>
+      </Dialog>
+    ),
+  },
+];
