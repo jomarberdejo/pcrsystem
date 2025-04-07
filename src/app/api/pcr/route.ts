@@ -32,7 +32,7 @@ export async function GET() {
     },
   });
   console.log(records)
-  const updatedData = records.map((report) => {
+  const updatedData = records.map((report: any) => {
     const formattedDate = moment
       .tz(report.date, "Asia/Manila")
       .format("YYYY MMMM DD (dddd)");
@@ -43,7 +43,7 @@ export async function GET() {
       computationCallToOpcen: computeTimeDiff(report.timeCalled, report.timeArrivedAt),
       computationERTDispatch: computeTimeDiff(report.timeDispatched, report.timeArrivedAt),
       ambulanceDriver: report.ambulanceDriver?.name,
-      ambulanceCrews: report.ambulanceCrews.map((rc) => rc.crew.name).join(", "),
+      ambulanceCrews: report.ambulanceCrews.map((rc: any) => rc.crew.name).join(", "),
     };
   });
 
