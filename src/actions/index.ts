@@ -1,14 +1,14 @@
 "use server";
 
 import { v2 as cloudinary } from "cloudinary";
-import moment from "moment";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { OperationType } from "@prisma/client";
+import { formatTimeInManila } from "@/lib/utils";
 
 cloudinary.config({
     cloudinary_url: process.env.CLOUDINARY_URL!,
-    secure: true
+    secure: true,
 });
 
 async function uploadToCloudinary(file: File): Promise<string> {
@@ -27,9 +27,10 @@ async function uploadToCloudinary(file: File): Promise<string> {
     });
 }
 
+
 export async function createPCRCaseRecord(formData: FormData) {
     const operationType = formData.get("operationType") as OperationType;
-    const date = formData.get("date") as string;
+    const date = new Date(formData.get("date") as string);
     const typeOfIncident = formData.get("typeOfIncident") as string;
     const placeOfIncident = formData.get("placeOfIncident") as string;
     const receivingFacility = formData.get("receivingFacility") as string;
@@ -39,35 +40,27 @@ export async function createPCRCaseRecord(formData: FormData) {
     const remarks = formData.get("remarks") as string;
     const vehicleUsed = formData.get("vehicleUsed") as string;
     const ambulanceDriverId = formData.get("ambulanceDriver") as string;
-
     const vehiclesInvolved = formData.getAll("vehiclesInvolved") as string[];
     const ambulanceCrewsId = formData.getAll("ambulanceCrew") as string[];
 
-    const formatTimeField = (fieldName: string): string | null => {
-        const value = formData.get(fieldName);
-        if (!value) return null;
-        return moment(new Date(value as string)).format("hh:mm A");
-    };
-
-    const timeCalled = formatTimeField("timeCalled");
-    const timeDispatched = formatTimeField("timeDispatched");
-    const timeAtScene = formatTimeField("timeAtScene");
-    const timeTransport = formatTimeField("timeTransport");
-    const timeEndorsed = formatTimeField("timeEndorsed");
-    const timeArrivedAt = formatTimeField("timeArrivedAt");
+    const timeCalled = formatTimeInManila(formData.get("timeCalled") as string);
+    const timeDispatched = formatTimeInManila(formData.get("timeDispatched") as string);
+    const timeAtScene = formatTimeInManila(formData.get("timeAtScene") as string);
+    const timeTransport = formatTimeInManila(formData.get("timeTransport") as string);
+    const timeEndorsed = formatTimeInManila(formData.get("timeEndorsed") as string);
+    const timeArrivedAt = formatTimeInManila(formData.get("timeArrivedAt") as string);
 
     const documentationFiles = formData.getAll("documentation") as File[];
-    const documentation: string[] = [];
 
-    for (const file of documentationFiles) {
-        const uploadedUrl = await uploadToCloudinary(file);
-        documentation.push(uploadedUrl);
-    }
+    const documentation = await Promise.all(
+        documentationFiles.map(uploadToCloudinary)
+    );
+
 
     await prisma.record.create({
         data: {
             operationType: operationType || "",
-            date: new Date(date),
+            date,
             typeOfIncident,
             placeOfIncident,
             receivingFacility,
@@ -79,19 +72,21 @@ export async function createPCRCaseRecord(formData: FormData) {
             ambulanceDriver: {
                 connect: { id: ambulanceDriverId },
             },
-            vehiclesInvolved: vehiclesInvolved.join(", "),
+            ...(vehiclesInvolved.length > 0 && {
+                vehiclesInvolved: vehiclesInvolved.join(", "),
+            }),
             ambulanceCrews: {
                 create: ambulanceCrewsId.map((crewId: string) => ({
                     crew: { connect: { id: crewId } },
                 })),
             },
             documentation,
-            timeCalled: timeCalled || "",
-            timeDispatched: timeDispatched || "",
-            timeAtScene: timeAtScene || "",
-            timeTransport: timeTransport || "",
-            timeEndorsed: timeEndorsed || "",
-            timeArrivedAt: timeArrivedAt || "",
+            timeCalled,
+            timeDispatched,
+            timeAtScene,
+            timeTransport,
+            timeEndorsed,
+            timeArrivedAt,
         },
     });
 

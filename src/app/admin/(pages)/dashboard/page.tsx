@@ -1,45 +1,46 @@
-"use client";
-
-import React from "react";
-import useSWR from "swr";
-import moment from "moment";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, FileCog, Calendar1, Ambulance } from "lucide-react";
 import { PCRReportType } from "@/types";
 import {
   getCurrentMonthCases,
-  getTopLocation,
   getVehicleUsage,
 } from "@/utils/dashboard/dataUtils";
 import { computeAverageDiff } from "@/utils/dashboard/timeUtils";
+import momentPH from "@/lib/moment";
+import { Metadata } from "next";
 
-const fetcher = (url: string): Promise<PCRReportType[]> =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch PCR data");
-    return res.json();
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
+
+const getPCRData = async (): Promise<PCRReportType[]> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pcr`, {
+    next: { revalidate: 60 },
   });
 
-const Dashboard = () => {
-  const {
-    data: pcrData,
-    error,
-    isLoading,
-  } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/pcr`, fetcher, {
-    refreshInterval: 60000,
-  });
+  if (!res.ok) throw new Error("Failed to fetch PCR data");
 
-  if (error) return <p className="text-red-500">Failed to fetch data</p>;
-  if (isLoading || !pcrData) return <p>Loading dashboard data...</p>;
+  return res.json();
+};
+
+const Dashboard = async () => {
+  let pcrData: PCRReportType[] = [];
+
+  try {
+    pcrData = await getPCRData();
+  } catch (error) {
+    return <p className="text-red-500">Failed to fetch data</p>;
+  }
 
   const totalTransport = pcrData.filter(
     (record) => record.operationType === "TRANSPORT"
   ).length;
+
   const totalEmergency = pcrData.filter(
     (record) => record.operationType === "EMERGENCY"
   ).length;
 
   const vehicleUsage = getVehicleUsage(pcrData);
-  // const topLocation = getTopLocation(pcrData);
   const currentMonthCases = getCurrentMonthCases(pcrData);
 
   const averageCallToOpcenTransport = computeAverageDiff(
@@ -48,18 +49,21 @@ const Dashboard = () => {
     "timeArrivedAt",
     "TRANSPORT"
   );
+
   const averageERTDispatchToOpcenTransport = computeAverageDiff(
     pcrData,
     "timeDispatched",
     "timeArrivedAt",
     "TRANSPORT"
   );
+
   const averageCallToOpcenEmergency = computeAverageDiff(
     pcrData,
     "timeCalled",
     "timeArrivedAt",
     "EMERGENCY"
   );
+
   const averageERTDispatchToOpcenEmergency = computeAverageDiff(
     pcrData,
     "timeDispatched",
@@ -85,26 +89,14 @@ const Dashboard = () => {
         <Card className="shadow-lg rounded-lg">
           <CardHeader className="flex items-center flex-row">
             <Calendar1 className="text-2xl text-green-500 mr-2" />
-            <CardTitle>Total PCR Cases for {moment().format("MMMM")}</CardTitle>
+            <CardTitle>
+              Total PCR Cases for {momentPH().format("MMMM")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{currentMonthCases}</p>
           </CardContent>
         </Card>
-
-        {/* Uncomment if you want to show top location */}
-        {/* <Card className="shadow-lg rounded-lg">
-          <CardHeader className="flex items-center flex-row">
-            <MapPin className="text-2xl text-red-500 mr-2" />
-            <CardTitle>Top Incident Location</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center">
-              <span>{topLocation.location}</span>
-              <span className="font-bold text-xl">{topLocation.count} (cases)</span>
-            </div>
-          </CardContent>
-        </Card> */}
 
         <Card className="shadow-lg rounded-lg">
           <CardHeader className="flex items-center flex-row">
@@ -113,19 +105,13 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <ul>
-              <li>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span>Transport</span>
-                    <span className="font-bold text-3xl">{totalTransport}</span>
-                  </div>
-                </div>
+              <li className="space-y-4 flex justify-between items-center">
+                <span>Transport</span>
+                <span className="font-bold text-3xl">{totalTransport}</span>
               </li>
-              <li>
-                <div className="flex justify-between items-center">
-                  <span>Emergency</span>
-                  <span className="font-bold text-3xl">{totalEmergency}</span>
-                </div>
+              <li className="flex justify-between items-center">
+                <span>Emergency</span>
+                <span className="font-bold text-3xl">{totalEmergency}</span>
               </li>
             </ul>
           </CardContent>
@@ -139,11 +125,12 @@ const Dashboard = () => {
           <CardContent>
             <ul>
               {Object.entries(vehicleUsage).map(([vehicle, count]) => (
-                <li key={vehicle} className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span>{vehicle}</span>
-                    <span className="font-bold text-3xl">{count}</span>
-                  </div>
+                <li
+                  key={vehicle}
+                  className="space-y-4 flex justify-between items-center"
+                >
+                  <span>{vehicle}</span>
+                  <span className="font-bold text-3xl">{count}</span>
                 </li>
               ))}
             </ul>
@@ -157,21 +144,17 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <ul>
-              <li className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>Call Received to Arrival at Opcen:</span>
-                  <span className="font-bold text-xl">
-                    {averageCallToOpcenTransport}
-                  </span>
-                </div>
+              <li className="flex justify-between items-center">
+                <span>Call Received to Arrival at Opcen:</span>
+                <span className="font-bold text-xl">
+                  {averageCallToOpcenTransport}
+                </span>
               </li>
-              <li className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>ERT Dispatch to Arrival at Opcen:</span>
-                  <span className="font-bold text-xl">
-                    {averageERTDispatchToOpcenTransport}
-                  </span>
-                </div>
+              <li className="flex justify-between items-center">
+                <span>ERT Dispatch to Arrival at Opcen:</span>
+                <span className="font-bold text-xl">
+                  {averageERTDispatchToOpcenTransport}
+                </span>
               </li>
             </ul>
           </CardContent>
@@ -184,21 +167,17 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <ul>
-              <li className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>Call Received to Arrival at Opcen:</span>
-                  <span className="font-bold text-xl">
-                    {averageCallToOpcenEmergency}
-                  </span>
-                </div>
+              <li className="flex justify-between items-center">
+                <span>Call Received to Arrival at Opcen:</span>
+                <span className="font-bold text-xl">
+                  {averageCallToOpcenEmergency}
+                </span>
               </li>
-              <li className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>ERT Dispatch to Arrival at Opcen:</span>
-                  <span className="font-bold text-xl">
-                    {averageERTDispatchToOpcenEmergency}
-                  </span>
-                </div>
+              <li className="flex justify-between items-center">
+                <span>ERT Dispatch to Arrival at Opcen:</span>
+                <span className="font-bold text-xl">
+                  {averageERTDispatchToOpcenEmergency}
+                </span>
               </li>
             </ul>
           </CardContent>

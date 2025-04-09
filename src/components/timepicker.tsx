@@ -12,13 +12,11 @@ interface TimePickerDemoProps {
 
 export function TimePickerDemo({ date, setDate }: TimePickerDemoProps) {
   const [period, setPeriod] = React.useState<Period>("PM");
-
   const minuteRef = React.useRef<HTMLInputElement>(null);
   const hourRef = React.useRef<HTMLInputElement>(null);
   const secondRef = React.useRef<HTMLInputElement>(null);
   const periodRef = React.useRef<HTMLButtonElement>(null);
 
-  // Set initial period based on the given date
   React.useEffect(() => {
     if (date) {
       const hours = date.getHours();

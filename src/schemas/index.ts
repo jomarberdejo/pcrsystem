@@ -13,7 +13,7 @@ export const formSchema = z.object({
   placeOfIncident: z.string().min(1, "Place of incident is required"),
   receivingFacility: z.string().min(1, "Receiving facility is required"),
   typeOfConduction: z.string().min(1, "Type of conduction is required"),
-  vehiclesInvolved: z.array(z.string()).min(1, "At least one vehicle must be involved"),
+  vehiclesInvolved: z.array(z.string()).optional(),
   chiefComplaint: z.string().min(1, "Chief complaint is required"),
   noOfCasualty: z.string().min(1, "No. of casualty is required"),
   remarks: z.string().min(1, "Remarks are required"),

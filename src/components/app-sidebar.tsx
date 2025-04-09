@@ -108,7 +108,7 @@ export const AppSidebar = () => {
               <div className="flex items-center gap-2">
                 <User className="text-xl" />
                 <div>
-                  <p className="text-sm font-semibold">MDRRMO Carigara</p>
+                  <p className="text-sm font-semibold">MDRRMO Admin</p>
                   <p className="text-xs text-muted-foreground">Administrator</p>
                 </div>
               </div>

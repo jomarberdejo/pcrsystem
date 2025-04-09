@@ -6,12 +6,34 @@ import { StaffType } from "@/types";
 import { DataTable } from "@/components/shared/data-table";
 import { staffColumns } from "@/components/shared/staff-columns";
 import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
+import useSWR from "swr";
 
-interface DriverClientProps {
-  ambulanceDriverData: StaffType[];
-}
+const fetcher = async (url: string): Promise<StaffType[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetched ambulance drivers data");
+  }
+  return res.json();
+};
 
-export function DriverClient({ ambulanceDriverData }: DriverClientProps) {
+export function DriverClient() {
+  const {
+    data: ambulanceDriverData,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/drivers`, fetcher, {
+    refreshInterval: 60000,
+  });
+
+  if (error) {
+    return <p className="text-red-500">Failed to fetch data</p>;
+  }
+
+  if (isLoading || !ambulanceDriverData) {
+    return <p>Loading ambulance driver data...</p>;
+  }
+
   const onRegister = async (type: "CREW" | "DRIVER", name: string) => {
     try {
       const response = await fetch(
@@ -30,6 +52,7 @@ export function DriverClient({ ambulanceDriverData }: DriverClientProps) {
         description: `New ambulance driver added: ${newDriver.name}`,
         position: "top-right",
       });
+      mutate();
     } catch (error) {
       console.error("Error registering driver:", error);
       toast.error("Failed to add driver.");

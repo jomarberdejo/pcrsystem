@@ -123,6 +123,7 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
             <Button
               variant="default"
               onClick={() => onExport(filteredData, exportTitle)}
+              disabled={filteredData.length === 0}
             >
               <Download />
               <span>Export to Excel</span>
@@ -135,6 +136,7 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
             <Button
               variant="default"
               onClick={() => onExport(data, exportTitle)}
+              disabled={data.length === 0}
             >
               <Download />
               <span>Export to Excel</span>

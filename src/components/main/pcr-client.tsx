@@ -1,15 +1,30 @@
 "use client";
 
-import { PCRReportType } from "@/types";
 import { DataTable } from "@/components/shared/data-table";
 import { exportToExcelAdvanced } from "@/utils/pcr-cases/exportToExcelCases";
 import { columns } from "./pcr-cases-column";
+import useSWR from "swr";
+import { PCRReportType } from "@/types";
 
-interface PCRClientProps {
-  pcrData: PCRReportType[];
-}
+const fetcher = async (url: string): Promise<PCRReportType[]> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("Failed to fetched pcr data");
+  }
+  return res.json();
+};
 
-export default function PCRClient({ pcrData }: PCRClientProps) {
+export function PCRCaseClient() {
+  const {
+    data: pcrData,
+    error,
+    isLoading,
+  } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/pcr`, fetcher, {
+    refreshInterval: 60000,
+  });
+
+  if (error) return <p className="text-red-500">Failed to fetch data</p>;
+  if (isLoading || !pcrData) return <p>Loading PCR data...</p>;
   return (
     <DataTable
       columns={columns}

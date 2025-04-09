@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import moment from "moment-timezone";
 import prisma from "@/lib/prisma";
-
+import { formatDateDisplay, formatTimeInManila } from "@/lib/utils";
+import momentPH from "@/lib/moment";
 function computeTimeDiff(startTime: string, endTime: string): string {
   const format = "h:mm A";
-  const start = moment(startTime, format);
-  const end = moment(endTime, format);
+  const start = momentPH(startTime, format);
+  const end = momentPH(endTime, format);
 
   if (end.isBefore(start)) {
     end.add(1, "day");
@@ -30,13 +30,13 @@ export async function GET() {
         include: { crew: true },
       },
     },
+    orderBy: {
+      date: 'desc',
+    },
   });
-  console.log(records)
-  const updatedData = records.map((report) => {
-    const formattedDate = moment
-      .tz(report.date, "Asia/Manila")
-      .format("YYYY MMMM DD (dddd)");
 
+  const updatedData = records.map((report) => {
+    const formattedDate = formatDateDisplay(report.date);
     return {
       ...report,
       date: formattedDate,

@@ -11,7 +11,6 @@ export const vehiclesInvolvedList = [
     { label: "Scooter", value: "Scooter" },
     { label: "Van", value: "Van" },
     { label: "E-Bike", value: "E-Bike" },
-    { label: "None", value: "None" },
 ]
 
 export const vehicleUsedList: string[] = [
@@ -21,42 +20,9 @@ export const vehicleUsedList: string[] = [
     "RV4",
     "RV5",
 ]
-export const ambulanceDriverList = [
-    {
-        label: "Michael Tagpis",
-        value: "a7fb87fc-6cc8-4fb9-af44-af845811ea962",
-    },
-    {
-        label: "Bryan Esmero",
-        value: "1074cefb-3628-4509-bdfe-f1fb390ed492",
-    },
-    {
-        label: "Ruel Borgueta",
-        value: "a6c6d0ba-1f08-40f7-bdd5-ddf46fea9ed3",
-    },
-    {
-        label: "Rey Montilla",
-        value: "a6c6d0ba-1f08-40f7-bdd5-ddf46fea9ed4",
-    },
 
-]
-type AmbulanceCrewType = { label: string; value: string; }
 
-export const ambulanceCrewList: AmbulanceCrewType[] = [
-    { label: "Merly Javines", value: "7a7c8a38-4af8-46b5-9652-102fbd8cdaec" },
-    {
-        label: "Edgardo Ace Encio",
-        value: "a7fb87fc-6cc8-4fb9-af44-af845811ea96",
-    },
-    {
-        label: "Maria Sherlyn Lauron",
-        value: "43ddf686-9ad4-4a59-875a-cdfddfb2d2d6",
-    },
-    {
-        label: "Jethro Basallaje",
-        value: "a6c6d0ba-1f08-40f7-bdd5-ddf46fea9ed5",
-    },
-]
+
 
 
 export const incidentTypeList = [
