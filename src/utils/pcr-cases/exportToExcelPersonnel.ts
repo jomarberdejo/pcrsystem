@@ -1,4 +1,4 @@
-import { StaffType } from "@/types";
+import { PersonnelType } from "@/types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import moment from "moment-timezone";
@@ -9,7 +9,7 @@ const formatMonthYear = (dateString: string) => {
 };
 
 export const exportToExcelPersonnel = async (
-  filteredData: StaffType[],
+  filteredData: PersonnelType[],
   exportTitle: string
 ) => {
   const workbook = new ExcelJS.Workbook();
