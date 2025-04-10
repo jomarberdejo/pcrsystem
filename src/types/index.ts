@@ -1,3 +1,4 @@
+import { Team } from "@prisma/client";
 import { type LucideIcon } from "lucide-react"
 
 export type NavItemsType = {
@@ -32,9 +33,10 @@ export type PCRReportType = {
   documentation: string[];
 }
 
-export interface StaffType {
+export interface PersonnelType {
   id: string;
   name: string;
+  team: Team;
   totalTransportCases: number;
   totalEmergencyCases: number;
   totalNumberOfOperations: number;

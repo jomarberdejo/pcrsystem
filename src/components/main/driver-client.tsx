@@ -1,17 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
-import { StaffType } from "@/types";
+import { PersonnelType } from "@/types";
 import { DataTable } from "@/components/shared/data-table";
 import { staffColumns } from "@/components/shared/staff-columns";
 import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
 import useSWR from "swr";
+import EditPersonnel from "@/components/shared/edit-personnel-modal";
 
-const fetcher = async (url: string): Promise<StaffType[]> => {
+const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error("Failed to fetched ambulance drivers data");
+    throw new Error("Failed to fetch ambulance drivers data");
   }
   return res.json();
 };
@@ -25,6 +26,10 @@ export function DriverClient() {
   } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/drivers`, fetcher, {
     refreshInterval: 60000,
   });
+
+  const [selectedPersonnel, setSelectedPersonnel] =
+    useState<PersonnelType | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   if (error) {
     return <p className="text-red-500">Failed to fetch data</p>;
@@ -60,13 +65,25 @@ export function DriverClient() {
   };
 
   return (
-    <DataTable
-      columns={staffColumns}
-      filterableColumns={["name"]}
-      data={ambulanceDriverData}
-      onExport={exportToExcelPersonnel}
-      exportTitle="AMBULANCE_DRIVERS"
-      onRegister={onRegister}
-    />
+    <>
+      <DataTable
+        columns={staffColumns({
+          setSelectedPersonnel,
+          setModalOpen,
+        })}
+        filterableColumns={["name"]}
+        data={ambulanceDriverData}
+        onExport={exportToExcelPersonnel}
+        exportTitle="AMBULANCE_DRIVERS"
+        onRegister={onRegister}
+      />
+      <EditPersonnel
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedPersonnel={selectedPersonnel}
+        mutate={mutate}
+        personnelType="drivers"
+      />
+    </>
   );
 }

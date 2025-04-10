@@ -1,16 +1,18 @@
 "use client";
 
-import { StaffType } from "@/types";
+import { PersonnelType } from "@/types";
 import { DataTable } from "@/components/shared/data-table";
 import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
 import { staffColumns } from "@/components/shared/staff-columns";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { useState } from "react";
+import EditPersonnel from "@/components/shared/edit-personnel-modal";
 
-const fetcher = async (url: string): Promise<StaffType[]> => {
+const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error("Failed to fetched ambulance crews data");
+    throw new Error("Failed to fetch ambulance crews data");
   }
   return res.json();
 };
@@ -25,13 +27,13 @@ export function CrewClient() {
     refreshInterval: 60000,
   });
 
-  if (error) {
-    return <p className="text-red-500">Failed to fetch data</p>;
-  }
+  const [selectedPersonnel, setSelectedPersonnel] =
+    useState<PersonnelType | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  if (isLoading || !ambulanceCrewData) {
+  if (error) return <p className="text-red-500">Failed to fetch data</p>;
+  if (isLoading || !ambulanceCrewData)
     return <p>Loading ambulance crew data...</p>;
-  }
 
   const onRegister = async (type: "CREW" | "DRIVER", name: string) => {
     try {
@@ -44,9 +46,7 @@ export function CrewClient() {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to add new crew");
-      }
+      if (!response.ok) throw new Error("Failed to add new crew");
 
       const newCrew = await response.json();
       toast.success("Success!", {
@@ -61,13 +61,22 @@ export function CrewClient() {
   };
 
   return (
-    <DataTable
-      columns={staffColumns}
-      filterableColumns={["name"]}
-      data={ambulanceCrewData}
-      onExport={exportToExcelPersonnel}
-      exportTitle="AMBULANCE_CREWS"
-      onRegister={onRegister}
-    />
+    <>
+      <DataTable
+        columns={staffColumns({ setSelectedPersonnel, setModalOpen })}
+        filterableColumns={["name"]}
+        data={ambulanceCrewData}
+        onExport={exportToExcelPersonnel}
+        exportTitle="AMBULANCE_CREWS"
+        onRegister={onRegister}
+      />
+      <EditPersonnel
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedPersonnel={selectedPersonnel}
+        mutate={mutate}
+        personnelType="crews"
+      />
+    </>
   );
 }

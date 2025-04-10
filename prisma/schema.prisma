@@ -13,10 +13,17 @@ enum OperationType {
   TRANSPORT
 }
 
+enum Team {
+  CHARLIE
+  BRAVO
+  ALPHA
+}
+
 model Personnel {
   id              String        @id @default(uuid()) @db.Uuid
   name            String
   role            PersonnelRole
+  team            Team          @default(ALPHA)
   recordsAsDriver Record[]      @relation("DriverRecords")
   recordsAsCrew   RecordCrew[]  @relation("CrewRecords")
 }

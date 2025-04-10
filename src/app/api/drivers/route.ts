@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { OperationType, PersonnelRole } from "@prisma/client";
+import { OperationType, PersonnelRole, Team } from "@prisma/client";
 
 export interface DriverResponse {
   id: string;
   name: string;
+  team: Team,
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -14,7 +15,7 @@ export interface DriverResponse {
   }[];
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(): Promise<NextResponse> {
   const drivers = await prisma.personnel.findMany({
     where: {
       OR: [
@@ -25,6 +26,7 @@ export async function GET(): Promise<Response> {
     select: {
       id: true,
       name: true,
+      team: true,
       recordsAsDriver: {
         select: {
           operationType: true,
@@ -43,6 +45,7 @@ export async function GET(): Promise<Response> {
     return {
       id: driver.id,
       name: driver.name,
+      team: driver.team,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
@@ -57,7 +60,7 @@ export async function GET(): Promise<Response> {
 }
 
 
-export async function POST(request: Request): Promise<Response> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { name } = await request.json();
 

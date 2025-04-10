@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { loginUser } from "@/actions/userService";
 import { toast } from "sonner";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock, Loader } from "lucide-react";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -23,6 +23,7 @@ export const LoginForm = () => {
     password: "",
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -32,6 +33,7 @@ export const LoginForm = () => {
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);
 
     try {
       const result = await loginUser(credentials);
@@ -51,6 +53,8 @@ export const LoginForm = () => {
       }
     } catch (error) {
       console.error("Error logging in: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,8 +137,13 @@ export const LoginForm = () => {
             <Button
               type="submit"
               className="w-full cursor-pointer font-semibold shadow-md transition-transform hover:scale-[1.02]"
+              disabled={loading}
             >
-              <Lock className="mr-2 h-4 w-4" />
+              {loading ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Lock className="mr-2 h-4 w-4" />
+              )}
               Login
             </Button>
           </form>

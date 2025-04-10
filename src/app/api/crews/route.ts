@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { OperationType, PersonnelRole } from "@prisma/client";
+import { OperationType, PersonnelRole, Team } from "@prisma/client";
 
 export interface CrewResponse {
   id: string;
   name: string;
+  team: Team,
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -14,7 +15,7 @@ export interface CrewResponse {
   }[];
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(): Promise<NextResponse> {
   const crews = await prisma.personnel.findMany({
     where: {
       OR: [
@@ -25,6 +26,7 @@ export async function GET(): Promise<Response> {
     select: {
       id: true,
       name: true,
+      team: true,
       recordsAsCrew: {
         select: {
           record: {
@@ -47,6 +49,7 @@ export async function GET(): Promise<Response> {
     return {
       id: crew.id,
       name: crew.name,
+      team: crew.team,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
@@ -60,7 +63,7 @@ export async function GET(): Promise<Response> {
   return NextResponse.json(result);
 }
 
-export async function POST(request: Request): Promise<Response> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { name } = await request.json();
 
@@ -88,3 +91,8 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: "Failed to create crew" }, { status: 500 });
   }
 }
+
+
+
+
+
