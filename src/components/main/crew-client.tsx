@@ -38,7 +38,7 @@ export function CrewClient() {
   const onRegister = async (
     type: "CREW" | "DRIVER",
     name: string,
-    team: "CHARLIE" | "BRAVO" | "ALPHA"
+    team: string
   ) => {
     try {
       const response = await fetch(

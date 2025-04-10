@@ -51,5 +51,5 @@ export interface PersonnelType {
 export type StaffFormPropType = {
   children: React.ReactNode;
   type: "CREW" | "DRIVER";
-  onRegister: (type: "CREW" | "DRIVER", name: string, team: "CHARLIE" | "BRAVO" | "ALPHA") => void;
+  onRegister: (type: "CREW" | "DRIVER", name: string, team: string) => void;
 };
