@@ -1,101 +1,89 @@
+import { SignJWT, jwtVerify } from 'jose';
+import prisma from './prisma';
+import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 
-// import bcrypt from 'bcrypt';
-// import jwt from 'jsonwebtoken';
-// import prisma from './prisma'
-// import { cookies } from 'next/headers';
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
+export const hashPassword = async (password: string): Promise<string> => {
+    return bcrypt.hash(password, 12);
+}
 
-// const JWT_SECRET = process.env.JWT_SECRET!;
+export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+    return bcrypt.compare(password, hashedPassword);
+}
 
+export const createSession = async (userId: string) => {
+    const cookieStore = await cookies();
 
-// const hashPashword = async (password: string): Promise<string> => {
-//     return bcrypt.hash(password, 12)
-// }
+    const sessionToken = await new SignJWT({ userId })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .sign(JWT_SECRET);
 
-// const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
-//     return bcrypt.compare(password, hashedPassword)
-// }
+    const session = await prisma.session.create({
+        data: {
+            userId,
+            sessionToken,
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+    });
 
-// const createSession = async (userId: string) => {
-//     const coookieStore = await cookies()
+    cookieStore.set('sessionToken', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV == "production",
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+    });
 
-//     const sessionToken = jwt.sign({
-//         userId
-//     }, JWT_SECRET, {
-//         expiresIn: '7d'
-//     })
+    return session;
+}
 
-//     const session = await prisma.session.create({
-//         data: {
-//             userId,
-//             sessionToken,
-//             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-//         }
-//     })
+export const getCurrentUser = async () => {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('sessionToken')?.value;
 
-//     coookieStore.set('sessionToken', sessionToken, {
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV == "production",
-//         sameSite: 'lax',
-//         maxAge: 60 * 60 * 24 * 7,
-//         path: '/',
-//     })
+    if (!sessionToken) {
+        return null;
+    }
 
-//     return session;
-// }
+    try {
+        const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+        const userId = payload.userId as string;
 
-// const getCurrentUser = async () => {
-//     const coookieStore = await cookies();
+        const user = await prisma.admin.findUnique({
+            where: { id: userId },
+            include: {
+                sessions: {
+                    where: { sessionToken }
+                }
+            }
+        });
 
-//     const sessionToken = coookieStore.get('sessionToken')?.value;
+        if (!user || !user.sessions.length) {
+            return null;
+        }
 
-//     if (!sessionToken) {
-//         return null
-//     }
+        return user;
+    } catch (error) {
+        console.error("Error getting current user", error);
+        return null;
+    }
+}
 
-//     try {
-//         const { userId } = jwt.verify(sessionToken, JWT_SECRET) as { userId: string }
+export const logout = async () => {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('sessionToken')?.value;
 
-//         const user = await prisma.admin.findUnique({
-//             where: {
-//                 id: userId
-//             },
-//             include: {
-//                 sessions: {
-//                     where: {
-//                         sessionToken,
-//                     }
-//                 }
-//             }
-//         })
-//         if (!user || !user.session.length) {
-//             return null
-//         }
+    if (!sessionToken) {
+        return;
+    }
 
-//         return user;
+    await prisma.session.deleteMany({
+        where: { sessionToken }
+    });
 
-
-//     } catch (error) {
-//         console.error("Error getting current user", error)
-//         return null
-//     }
-
-
-
-// }
-
-// const logout = async () => {
-//     const cookieStore = await cookies();
-
-//     const sessionToken = cookieStore.get('sessionToken')?.value;
-//     if (!sessionToken) {
-//         return;
-//     }
-//     await prisma.session.deleteMany({
-//         where: {
-//             sessionToken
-//         }
-//     })
-
-//     cookieStore.delete('sessionToken')
-// }
+    cookieStore.delete('sessionToken');
+}

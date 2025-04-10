@@ -31,10 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./toggle-mode";
 import { usePathname, useRouter } from "next/navigation";
-
-const handleLogout = (router: any) => {
-  router.push("/");
-};
+import { toast } from "sonner";
 
 const items: NavItemsType[] = [
   {
@@ -62,16 +59,35 @@ const items: NavItemsType[] = [
     url: "/admin/drivers",
     icon: Ambulance,
   },
-  // {
-  //   title: "Form Customization",
-  //   url: "/admin/customization",
-  //   icon: Settings,
-  // },
 ];
 
 export const AppSidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        router.push("/");
+        router.refresh();
+        toast.success("Logged out successfully", {
+          position: "top-right",
+        });
+      } else {
+        throw new Error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again."); // Optional error notification
+    }
+  };
 
   return (
     <Sidebar>
@@ -122,7 +138,7 @@ export const AppSidebar = () => {
               <Button
                 variant="outline"
                 className="cursor-pointer"
-                onClick={() => handleLogout(router)}
+                onClick={handleLogout}
               >
                 <ArrowLeft /> <span>Logout</span>
               </Button>

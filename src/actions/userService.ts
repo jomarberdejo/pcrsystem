@@ -1,4 +1,5 @@
 "use server";
+import { createSession } from '@/lib/auth';
 import prisma from '@/lib/prisma'
 
 export const loginUser = async ({ username, password }: { username: string; password: string }) => {
@@ -9,6 +10,7 @@ export const loginUser = async ({ username, password }: { username: string; pass
     })
     if (user) {
         if (user.password === password) {
+            await createSession(user.id)
             return true;
         }
         else {

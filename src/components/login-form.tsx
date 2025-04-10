@@ -103,21 +103,20 @@ export const LoginForm = () => {
                 <Label htmlFor="password" className="font-medium">
                   Password
                 </Label>
-                <button
-                  type="button"
+                <span
                   onClick={() => setPasswordVisible(!passwordVisible)}
-                  className="text-sm text-muted-foreground absolute right-2 top-8"
+                  className="text-sm text-muted-foreground absolute right-2 top-8 cursor-pointer"
                 >
                   {passwordVisible ? (
                     <EyeOff className="h-5 w-5" />
                   ) : (
                     <Eye className="h-5 w-5" />
                   )}
-                </button>
+                </span>
               </div>
               <Input
                 id="password"
-                type={passwordVisible ? "text" : "password"} // Toggle input type based on password visibility
+                type={passwordVisible ? "text" : "password"}
                 autoComplete="current-password"
                 value={credentials.password}
                 placeholder="Your password..."
