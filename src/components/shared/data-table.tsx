@@ -47,7 +47,11 @@ interface DataTableProps<TData, TValue> {
   onExport?: (data: TData[], exportTitle: string) => void;
   exportTitle: string;
   hasDateRange?: boolean;
-  onRegister?: (type: "CREW" | "DRIVER", name: string) => void;
+  onRegister?: (
+    type: "CREW" | "DRIVER",
+    name: string,
+    team: "CHARLIE" | "BRAVO" | "ALPHA"
+  ) => void;
 }
 
 export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({

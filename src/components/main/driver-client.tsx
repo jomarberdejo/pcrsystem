@@ -39,14 +39,18 @@ export function DriverClient() {
     return <p>Loading ambulance driver data...</p>;
   }
 
-  const onRegister = async (type: "CREW" | "DRIVER", name: string) => {
+  const onRegister = async (
+    type: "CREW" | "DRIVER",
+    name: string,
+    team: "CHARLIE" | "BRAVO" | "ALPHA"
+  ) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/drivers`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name }),
+          body: JSON.stringify({ name, team }),
         }
       );
 

@@ -35,14 +35,18 @@ export function CrewClient() {
   if (isLoading || !ambulanceCrewData)
     return <p>Loading ambulance crew data...</p>;
 
-  const onRegister = async (type: "CREW" | "DRIVER", name: string) => {
+  const onRegister = async (
+    type: "CREW" | "DRIVER",
+    name: string,
+    team: "CHARLIE" | "BRAVO" | "ALPHA"
+  ) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/crews`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name }),
+          body: JSON.stringify({ name, team }),
         }
       );
 

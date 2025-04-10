@@ -65,15 +65,16 @@ export async function GET(): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const { name } = await request.json();
+    const { name, team } = await request.json();
 
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    if (!name || !team) {
+      return NextResponse.json({ error: "Name or Team is required" }, { status: 400 });
     }
 
     const newCrew = await prisma.personnel.create({
       data: {
         name,
+        team,
         role: PersonnelRole.CREW,
       },
     });

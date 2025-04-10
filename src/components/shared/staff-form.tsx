@@ -23,9 +23,17 @@ import { Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const staffSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  team: z.string().min(1, "Team is required"),
 });
 
 type StaffFormValues = z.infer<typeof staffSchema>;
@@ -35,11 +43,12 @@ const StaffForm = ({ children, type, onRegister }: StaffFormPropType) => {
     resolver: zodResolver(staffSchema),
     defaultValues: {
       name: "",
+      team: "",
     },
   });
 
   const onSubmit = (data: StaffFormValues) => {
-    onRegister(type, data.name);
+    onRegister(type, data.name, data.team);
   };
 
   return (
@@ -75,6 +84,31 @@ const StaffForm = ({ children, type, onRegister }: StaffFormPropType) => {
                   </Label>
                   <FormControl>
                     <Input id="name" {...field} className="col-span-3" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="team"
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="team" className="text-right">
+                    Team
+                  </Label>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a team" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALPHA">ALPHA</SelectItem>
+                        <SelectItem value="BRAVO">BRAVO</SelectItem>
+                        <SelectItem value="CHARLIE">CHARLIE</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
