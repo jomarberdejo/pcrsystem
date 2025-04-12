@@ -1,4 +1,4 @@
-import { Team } from "@prisma/client";
+import { PersonnelRole, Team } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
 
@@ -7,7 +7,7 @@ export async function PUT(request: NextRequest, { params }: {
 }): Promise<NextResponse> {
     try {
         const id = (await params).id;
-        const { name, team }: { name?: string, team?: Team } = await request.json();
+        const { name, team, role }: { name?: string, team?: Team, role?: PersonnelRole } = await request.json();
 
         if (!id) {
             return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -26,6 +26,7 @@ export async function PUT(request: NextRequest, { params }: {
             data: {
                 name,
                 team,
+                role,
             },
         });
 

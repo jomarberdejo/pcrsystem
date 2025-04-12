@@ -41,7 +41,7 @@ import { DatePicker } from "@/components/date-picker";
 import { TimePickerDemo } from "@/components/timepicker";
 import { useRouter } from "next/navigation";
 import { formSchema } from "@/schemas";
-import { Check, CloudUpload, Paperclip } from "lucide-react";
+import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
 
 export function PCRFormClient() {
   const [operationType, setOperationType] = useState<
@@ -656,8 +656,17 @@ export function PCRFormClient() {
               </div>
             </div>
 
-            <Button type="submit" className="cursor-pointer">
-              <Check /> <span>Submit</span>
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="mr-2 h-4 w-4" />
+              )}
+              <span>Submit</span>
             </Button>
           </>
         )}

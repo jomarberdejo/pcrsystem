@@ -1,4 +1,4 @@
-import { Team } from "@prisma/client";
+import { PersonnelRole, Team } from "@prisma/client";
 import { type LucideIcon } from "lucide-react"
 
 export type NavItemsType = {
@@ -37,6 +37,7 @@ export interface PersonnelType {
   id: string;
   name: string;
   team: Team;
+  role: PersonnelRole,
   totalTransportCases: number;
   totalEmergencyCases: number;
   totalNumberOfOperations: number;

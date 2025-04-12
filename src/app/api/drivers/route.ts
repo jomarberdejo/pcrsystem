@@ -5,7 +5,8 @@ import { OperationType, PersonnelRole, Team } from "@prisma/client";
 export interface DriverResponse {
   id: string;
   name: string;
-  team: Team,
+  team: Team | null,
+  role: PersonnelRole,
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -16,7 +17,7 @@ export interface DriverResponse {
 }
 
 export async function GET(): Promise<NextResponse> {
-  const drivers = await prisma.personnel.findMany({
+  const personnels = await prisma.personnel.findMany({
     where: {
       OR: [
         { role: PersonnelRole.DRIVER },
@@ -27,29 +28,49 @@ export async function GET(): Promise<NextResponse> {
       id: true,
       name: true,
       team: true,
+      role: true,
       recordsAsDriver: {
         select: {
           operationType: true,
           date: true,
         },
       },
+      recordsAsCrew: {
+        select: {
+          record: {
+            select: {
+              operationType: true,
+              date: true,
+            },
+          },
+        },
+      },
     },
+    orderBy: {
+      name: "asc"
+    }
   });
 
-  const result: DriverResponse[] = drivers.map((driver) => {
-    const records = driver.recordsAsDriver;
-    const totalNumberOfOperations = records.length;
-    const totalEmergencyCases = records.filter(r => r.operationType === "EMERGENCY").length;
-    const totalTransportCases = records.filter(r => r.operationType === "TRANSPORT").length;
+  const result: DriverResponse[] = personnels.map((person) => {
+    const driverRecords = person.recordsAsDriver;
+
+    const crewRecords = person.recordsAsCrew.map(rc => rc.record);
+
+    const allRecords = [...driverRecords, ...crewRecords];
+
+    const totalNumberOfOperations = allRecords.length;
+    const totalEmergencyCases = allRecords.filter(r => r.operationType === "EMERGENCY").length;
+    const totalTransportCases = allRecords.filter(r => r.operationType === "TRANSPORT").length;
 
     return {
-      id: driver.id,
-      name: driver.name,
-      team: driver.team,
+      id: person.id,
+      name: person.name,
+      team: person.team,
+      role: person.role,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
-      records: records.map(r => ({
+      records: allRecords.map(r => ({
         operationType: r.operationType,
         date: r.date.toISOString(),
       })),
@@ -58,6 +79,7 @@ export async function GET(): Promise<NextResponse> {
 
   return NextResponse.json(result);
 }
+
 
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

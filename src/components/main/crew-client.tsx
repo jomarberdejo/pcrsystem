@@ -68,7 +68,7 @@ export function CrewClient() {
     <>
       <DataTable
         columns={staffColumns({ setSelectedPersonnel, setModalOpen })}
-        filterableColumns={["name"]}
+        filterableColumns={["name", "team"]}
         data={ambulanceCrewData}
         onExport={exportToExcelPersonnel}
         exportTitle="AMBULANCE_CREWS"

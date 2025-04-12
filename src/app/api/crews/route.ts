@@ -5,7 +5,8 @@ import { OperationType, PersonnelRole, Team } from "@prisma/client";
 export interface CrewResponse {
   id: string;
   name: string;
-  team: Team,
+  team: Team | null,
+  role: PersonnelRole,
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -27,6 +28,7 @@ export async function GET(): Promise<NextResponse> {
       id: true,
       name: true,
       team: true,
+      role: true,
       recordsAsCrew: {
         select: {
           record: {
@@ -37,23 +39,35 @@ export async function GET(): Promise<NextResponse> {
           },
         },
       },
+      recordsAsDriver: {
+        select: {
+          operationType: true,
+          date: true,
+        },
+      },
     },
+    orderBy: {
+      name: "asc"
+    }
   });
 
-  const result: CrewResponse[] = crews.map((crew) => {
-    const records = crew.recordsAsCrew.map((rc) => rc.record);
-    const totalNumberOfOperations = records.length;
-    const totalEmergencyCases = records.filter((r) => r.operationType === "EMERGENCY").length;
-    const totalTransportCases = records.filter((r) => r.operationType === "TRANSPORT").length;
+  const result: CrewResponse[] = crews.map((person) => {
+    const crewRecords = person.recordsAsCrew.map((rc) => rc.record);
+    const driverRecords = person.recordsAsDriver;
+    const allRecords = [...crewRecords, ...driverRecords];
+    const totalNumberOfOperations = allRecords.length;
+    const totalEmergencyCases = allRecords.filter((r) => r.operationType === "EMERGENCY").length;
+    const totalTransportCases = allRecords.filter((r) => r.operationType === "TRANSPORT").length;
 
     return {
-      id: crew.id,
-      name: crew.name,
-      team: crew.team,
+      id: person.id,
+      name: person.name,
+      team: person.team,
+      role: person.role,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
-      records: records.map((r) => ({
+      records: allRecords.map((r) => ({
         operationType: r.operationType,
         date: r.date.toISOString(),
       })),

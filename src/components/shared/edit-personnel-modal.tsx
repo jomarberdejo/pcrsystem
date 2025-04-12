@@ -31,6 +31,7 @@ import { useEffect } from "react";
 const editFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   team: z.string().min(1, "Team is required"),
+  role: z.string().min(1, "Role/Designation is required"),
 });
 
 type EditPersonnelProps = {
@@ -53,6 +54,7 @@ export default function EditPersonnel({
     defaultValues: {
       name: "",
       team: "",
+      role: "",
     },
   });
 
@@ -61,6 +63,7 @@ export default function EditPersonnel({
       form.reset({
         name: selectedPersonnel.name,
         team: selectedPersonnel.team || "",
+        role: selectedPersonnel.role || "",
       });
     }
   }, [selectedPersonnel, form]);
@@ -131,6 +134,29 @@ export default function EditPersonnel({
                         <SelectItem value="ALPHA">ALPHA</SelectItem>
                         <SelectItem value="BRAVO">BRAVO</SelectItem>
                         <SelectItem value="CHARLIE">CHARLIE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role/Designation</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a Personnel Role/Designation" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DRIVER">DRIVER</SelectItem>
+                        <SelectItem value="CREW">CREW</SelectItem>
+                        <SelectItem value="BOTH">DRIVER/CREW</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>

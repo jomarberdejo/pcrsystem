@@ -75,7 +75,7 @@ export function DriverClient() {
           setSelectedPersonnel,
           setModalOpen,
         })}
-        filterableColumns={["name"]}
+        filterableColumns={["name", "team"]}
         data={ambulanceDriverData}
         onExport={exportToExcelPersonnel}
         exportTitle="AMBULANCE_DRIVERS"

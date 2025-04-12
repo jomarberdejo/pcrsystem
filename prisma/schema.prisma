@@ -23,7 +23,7 @@ model Personnel {
   id              String        @id @default(uuid()) @db.Uuid
   name            String
   role            PersonnelRole
-  team            Team          @default(ALPHA)
+  team            Team?
   recordsAsDriver Record[]      @relation("DriverRecords")
   recordsAsCrew   RecordCrew[]  @relation("CrewRecords")
 }

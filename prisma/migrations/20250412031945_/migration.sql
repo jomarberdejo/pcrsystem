@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Personnel" ALTER COLUMN "team" DROP NOT NULL,
+ALTER COLUMN "team" DROP DEFAULT;
