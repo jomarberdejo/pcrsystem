@@ -132,7 +132,7 @@ export const AppSidebar = () => {
             <ModeToggle />
           </div>
 
-          <PopoverContent className="w-54 ml-1 mb-2 p-4 rounded-md">
+          <PopoverContent className="sm:w-54 w-full mr-1 ml-1 mb-2 p-4 rounded-md">
             <div className="flex flex-col gap-2">
               <h4 className="font-medium">Are you sure you want to log out?</h4>
               <Button

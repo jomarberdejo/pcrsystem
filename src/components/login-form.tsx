@@ -60,9 +60,9 @@ export const LoginForm = () => {
 
   const getGreeting = () => {
     const hour = momentPH().hour();
-    if (hour < 12) return "Maopay nga aga!";
-    if (hour < 18) return "Maopay nga kulop!";
-    return "Maopay nga gab-i";
+    if (hour < 12) return "Maupay nga aga!";
+    if (hour < 18) return "Maupay nga kulop!";
+    return "Maupay nga gab-i";
   };
 
   return (
@@ -160,11 +160,16 @@ export const LoginForm = () => {
                 disabled={loading}
               >
                 {loading ? (
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Logging In...
+                  </>
                 ) : (
-                  <Lock className="mr-2 h-4 w-4" />
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Login
+                  </>
                 )}
-                Login
               </Button>
             </form>
 

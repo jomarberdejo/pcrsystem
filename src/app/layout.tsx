@@ -67,13 +67,7 @@ export const metadata: Metadata = {
     locale: "en_PH",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "PCR System MDRRMO",
-    description:
-      "Secure and organized emergency report records by MDRRMO Carigara.",
-    images: ["/og-image.png"],
-  },
+
   category: "Government",
 };
 
@@ -98,6 +92,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+
           <Toaster />
         </ThemeProvider>
       </body>
