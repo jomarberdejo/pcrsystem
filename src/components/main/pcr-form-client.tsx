@@ -155,7 +155,7 @@ export function PCRFormClient() {
           <FormsSkeleton />
         ) : (
           <>
-            <div className="grid grid-cols-16 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-16 gap-4">
               {/* Operation Type */}
               <div className="col-span-4">
                 <FormField
@@ -248,7 +248,7 @@ export function PCRFormClient() {
             </div>
 
             {/* Additional time fields */}
-            <div className="grid grid-cols-16 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-16 gap-4">
               <div className="col-span-4">
                 <FormField
                   control={form.control}
@@ -324,7 +324,7 @@ export function PCRFormClient() {
             </div>
 
             {/* Incident & Facility Details */}
-            <div className="grid grid-cols-16 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-16 gap-4">
               <div className="col-span-4">
                 <FormField
                   control={form.control}
@@ -449,7 +449,7 @@ export function PCRFormClient() {
             </div>
 
             {/* Vehicles, Chief Complaint, Casualty, Remarks */}
-            <div className="grid grid-cols-16 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-16 gap-4">
               <div className="col-span-4">
                 <FormField
                   control={form.control}
@@ -518,7 +518,7 @@ export function PCRFormClient() {
             </div>
 
             {/* Vehicle Used, Ambulance Driver, Ambulance Crew, Documentation */}
-            <div className="grid grid-cols-16 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-16 gap-4">
               <div className="col-span-4">
                 <FormField
                   control={form.control}
@@ -663,11 +663,16 @@ export function PCRFormClient() {
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? (
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
               ) : (
-                <Check className="mr-2 h-4 w-4" />
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  <span>Save</span>
+                </>
               )}
-              <span>Submit</span>
             </Button>
           </>
         )}

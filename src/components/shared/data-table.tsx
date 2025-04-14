@@ -99,7 +99,7 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
 
   return (
     <div>
-      <div className="flex items-center gap-4 py-4">
+      <div className="flex items-center flex-wrap lg:flex-nowrap gap-4 py-4">
         {filterableColumns.map((col) => (
           <Input
             key={col}
@@ -108,7 +108,7 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
             onChange={(event) =>
               table.getColumn(col)?.setFilterValue(event.target.value)
             }
-            className="max-w-sm border-border outline-ring/50"
+            className="max-w-sm w-full border-border outline-ring/50"
           />
         ))}
         {hasDateRange && (
