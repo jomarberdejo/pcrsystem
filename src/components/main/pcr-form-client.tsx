@@ -42,6 +42,7 @@ import { TimePickerDemo } from "@/components/timepicker";
 import { useRouter } from "next/navigation";
 import { formSchema } from "@/schemas";
 import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
+import { FormsSkeleton } from "@/components/skeletons/forms-skeleton";
 
 export function PCRFormClient() {
   const [operationType, setOperationType] = useState<
@@ -151,7 +152,7 @@ export function PCRFormClient() {
         </h1>
 
         {isLoading ? (
-          <div className="h-full">Loading options...</div>
+          <FormsSkeleton />
         ) : (
           <>
             <div className="grid grid-cols-16 gap-4">

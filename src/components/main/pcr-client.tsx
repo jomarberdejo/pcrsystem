@@ -5,6 +5,7 @@ import { exportToExcelAdvanced } from "@/utils/pcr-cases/exportToExcelCases";
 import { columns } from "./pcr-cases-column";
 import useSWR from "swr";
 import { PCRReportType } from "@/types";
+import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 
 const fetcher = async (url: string): Promise<PCRReportType[]> => {
   const res = await fetch(url);
@@ -24,7 +25,7 @@ export function PCRCaseClient() {
   });
 
   if (error) return <p className="text-red-500">Failed to fetch data</p>;
-  if (isLoading || !pcrData) return <p>Loading PCR data...</p>;
+  if (isLoading || !pcrData) return <DataTableSkeleton />;
   return (
     <DataTable
       columns={columns}

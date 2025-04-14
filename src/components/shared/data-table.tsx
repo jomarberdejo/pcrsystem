@@ -188,10 +188,10 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
                   return (
                     <TableHead
                       key={header.id}
-                      style={{
-                        minWidth: header.column.columnDef.size,
-                        maxWidth: header.column.columnDef.size,
-                      }}
+                      // style={{
+                      //   minWidth: header.column.columnDef.size,
+                      //   maxWidth: header.column.columnDef.size,
+                      // }}
                     >
                       {header.isPlaceholder
                         ? null

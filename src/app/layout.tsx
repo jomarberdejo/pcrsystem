@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     siteName: "PCR System | MDRRMO Carigara",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og/og-image.png",
         width: 1200,
         height: 630,
         alt: "PCR System MDRRMO - Emergency Records",

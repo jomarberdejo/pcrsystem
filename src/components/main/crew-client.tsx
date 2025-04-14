@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { useState } from "react";
 import EditPersonnel from "@/components/shared/edit-personnel-modal";
+import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
@@ -32,8 +33,7 @@ export function CrewClient() {
   const [modalOpen, setModalOpen] = useState(false);
 
   if (error) return <p className="text-red-500">Failed to fetch data</p>;
-  if (isLoading || !ambulanceCrewData)
-    return <p>Loading ambulance crew data...</p>;
+  if (isLoading || !ambulanceCrewData) return <DataTableSkeleton />;
 
   const onRegister = async (
     type: "CREW" | "DRIVER",

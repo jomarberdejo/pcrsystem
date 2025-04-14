@@ -60,6 +60,26 @@ export const staffColumns = ({
     },
   },
   {
+    accessorKey: "role",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Role/Designation
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const personnelRole = row.original;
+
+      const formatRole =
+        personnelRole.role === "BOTH" ? "DRIVER/CREW" : personnelRole.role;
+
+      return <span className="font-medium">{formatRole}</span>;
+    },
+  },
+  {
     accessorKey: "totalTransportCases",
     header: ({ column }) => (
       <Button

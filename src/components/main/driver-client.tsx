@@ -8,6 +8,7 @@ import { staffColumns } from "@/components/shared/staff-columns";
 import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
 import useSWR from "swr";
 import EditPersonnel from "@/components/shared/edit-personnel-modal";
+import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
@@ -36,7 +37,7 @@ export function DriverClient() {
   }
 
   if (isLoading || !ambulanceDriverData) {
-    return <p>Loading ambulance driver data...</p>;
+    return <DataTableSkeleton />;
   }
 
   const onRegister = async (
