@@ -11,7 +11,7 @@ export default function CrewPage() {
     <div className="w-full mx-auto overflow-x-hidden py-4">
       <Card className="border-hidden shadow-none">
         <CardHeader>
-          <CardTitle>MDRRMO Ambulance Crews</CardTitle>
+          <CardTitle>MDRRMO Crew Personnels</CardTitle>
         </CardHeader>
         <CardContent>
           <CrewClient />

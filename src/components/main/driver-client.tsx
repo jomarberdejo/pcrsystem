@@ -13,7 +13,7 @@ import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error("Failed to fetch ambulance drivers data");
+    throw new Error("Failed to fetch driver personnels data");
   }
   return res.json();
 };
@@ -59,7 +59,7 @@ export function DriverClient() {
 
       const newDriver = await response.json();
       toast.success("Success!", {
-        description: `New ambulance driver added: ${newDriver.name}`,
+        description: `New driver personnel added: ${newDriver.name}`,
         position: "top-right",
       });
       mutate();

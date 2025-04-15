@@ -60,13 +60,13 @@ const StaffForm = ({ children, type, onRegister }: StaffFormPropType) => {
         <SheetHeader>
           <SheetTitle>
             {type === "CREW"
-              ? "Ambulance Crew Registration"
-              : "Ambulance Driver Registration"}
+              ? "Crew Personnel Registration"
+              : "Driver Personnel Registration"}
           </SheetTitle>
           <SheetDescription>
             {type === "CREW"
-              ? "Fill in the details to register a new ambulance crew member."
-              : "Fill in the details to register a new ambulance driver."}
+              ? "Fill in the details to register a new crew."
+              : "Fill in the details to register a new driver."}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>

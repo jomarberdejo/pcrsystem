@@ -50,12 +50,12 @@ const items: NavItemsType[] = [
     icon: ClipboardList,
   },
   {
-    title: "Ambulance Crews",
+    title: "Crew Personnels",
     url: "/admin/crews",
     icon: Users,
   },
   {
-    title: "Ambulance Drivers",
+    title: "Driver Personnels",
     url: "/admin/drivers",
     icon: Ambulance,
   },

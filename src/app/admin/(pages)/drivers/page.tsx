@@ -10,7 +10,7 @@ export default function DriverPage() {
     <div className="w-full overflow-x-hidden py-4">
       <Card className="border-hidden shadow-none">
         <CardHeader>
-          <CardTitle>MDRRMO Ambulance Drivers</CardTitle>
+          <CardTitle>MDRRMO Driver Personnels</CardTitle>
         </CardHeader>
         <CardContent>
           <DriverClient />

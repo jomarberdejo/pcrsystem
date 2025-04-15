@@ -13,7 +13,7 @@ import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error("Failed to fetch ambulance crews data");
+    throw new Error("Failed to fetch crew personnels data");
   }
   return res.json();
 };
@@ -54,7 +54,7 @@ export function CrewClient() {
 
       const newCrew = await response.json();
       toast.success("Success!", {
-        description: `New ambulance crew added: ${newCrew.name}`,
+        description: `New crew personnel added: ${newCrew.name}`,
         position: "top-right",
       });
       mutate();
