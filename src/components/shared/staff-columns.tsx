@@ -38,6 +38,26 @@ export const staffColumns = ({
     ),
   },
   {
+    id: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const statusColor =
+        status === "ACTIVE"
+          ? "bg-gray-200 text-gray-800"
+          : "bg-green-100 text-green-700";
+
+      return (
+        <span
+          className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+
+  {
     accessorKey: "team",
     header: ({ column }) => (
       <Button

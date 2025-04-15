@@ -33,7 +33,7 @@ import {
 
 const staffSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  team: z.string().min(1, "Team is required"),
+  team: z.string().optional(),
 });
 
 type StaffFormValues = z.infer<typeof staffSchema>;
@@ -48,7 +48,7 @@ const StaffForm = ({ children, type, onRegister }: StaffFormPropType) => {
   });
 
   const onSubmit = (data: StaffFormValues) => {
-    onRegister(type, data.name, data.team);
+    onRegister(type, data.name, data.team || "");
   };
 
   return (

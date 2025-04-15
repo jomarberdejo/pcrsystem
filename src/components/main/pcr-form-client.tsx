@@ -60,12 +60,12 @@ export function PCRFormClient() {
     defaultValues: {
       operationType: "",
       date: new Date(),
-      timeCalled: new Date(),
-      timeDispatched: new Date(),
-      timeAtScene: new Date(),
-      timeTransport: new Date(),
-      timeEndorsed: new Date(),
-      timeArrivedAt: new Date(),
+      timeCalled: undefined,
+      timeDispatched: undefined,
+      timeAtScene: undefined,
+      timeTransport: undefined,
+      timeEndorsed: undefined,
+      timeArrivedAt: undefined,
       typeOfIncident: "",
       placeOfIncident: "",
       receivingFacility: "",
@@ -84,23 +84,40 @@ export function PCRFormClient() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const formData = new FormData();
+
       formData.append("operationType", values.operationType);
       formData.append("date", values.date.toISOString());
-      formData.append("timeCalled", values.timeCalled.toISOString());
-      formData.append("timeDispatched", values.timeDispatched.toISOString());
-      formData.append("timeAtScene", values.timeAtScene.toISOString());
-      formData.append("timeTransport", values.timeTransport.toISOString());
-      formData.append("timeEndorsed", values.timeEndorsed.toISOString());
-      formData.append("timeArrivedAt", values.timeArrivedAt.toISOString());
-      formData.append("typeOfIncident", values.typeOfIncident);
-      formData.append("placeOfIncident", values.placeOfIncident);
-      formData.append("receivingFacility", values.receivingFacility);
-      formData.append("typeOfConduction", values.typeOfConduction);
-      formData.append("chiefComplaint", values.chiefComplaint);
-      formData.append("noOfCasualty", values.noOfCasualty);
-      formData.append("remarks", values.remarks);
-      formData.append("vehicleUsed", values.vehicleUsed);
-      formData.append("ambulanceDriver", values.ambulanceDriver);
+
+      if (values.timeCalled)
+        formData.append("timeCalled", values.timeCalled.toISOString());
+      if (values.timeDispatched)
+        formData.append("timeDispatched", values.timeDispatched.toISOString());
+      if (values.timeAtScene)
+        formData.append("timeAtScene", values.timeAtScene.toISOString());
+      if (values.timeTransport)
+        formData.append("timeTransport", values.timeTransport.toISOString());
+      if (values.timeEndorsed)
+        formData.append("timeEndorsed", values.timeEndorsed.toISOString());
+      if (values.timeArrivedAt)
+        formData.append("timeArrivedAt", values.timeArrivedAt.toISOString());
+
+      if (values.typeOfIncident)
+        formData.append("typeOfIncident", values.typeOfIncident);
+      if (values.placeOfIncident)
+        formData.append("placeOfIncident", values.placeOfIncident);
+      if (values.receivingFacility)
+        formData.append("receivingFacility", values.receivingFacility);
+      if (values.typeOfConduction)
+        formData.append("typeOfConduction", values.typeOfConduction);
+      if (values.chiefComplaint)
+        formData.append("chiefComplaint", values.chiefComplaint);
+      if (values.noOfCasualty)
+        formData.append("noOfCasualty", values.noOfCasualty);
+      if (values.remarks) formData.append("remarks", values.remarks);
+      if (values.vehicleUsed)
+        formData.append("vehicleUsed", values.vehicleUsed);
+      if (values.ambulanceDriver)
+        formData.append("ambulanceDriver", values.ambulanceDriver);
 
       if (values.vehiclesInvolved) {
         values.vehiclesInvolved.forEach((vehicle) =>
@@ -108,24 +125,26 @@ export function PCRFormClient() {
         );
       }
 
-      values.ambulanceCrew.forEach((crew) =>
-        formData.append("ambulanceCrew", crew)
-      );
-      values.documentation.forEach((file: File) =>
-        formData.append("documentation", file)
-      );
+      if (values.ambulanceCrew?.length > 0) {
+        values.ambulanceCrew.forEach((crew) =>
+          formData.append("ambulanceCrew", crew)
+        );
+      }
+
+      if (values.documentation) {
+        values.documentation.forEach((file: File) =>
+          formData.append("documentation", file)
+        );
+      }
 
       await createPCRCaseRecord(formData);
 
       console.log(values);
       toast.success("Success!", {
         description: "A new PCR Case was recorded.",
-        // action: {
-        //   label: "Undo",
-        //   onClick: () => console.log("Undo"),
-        // },
         position: "top-right",
       });
+
       router.push("/admin/pcr-cases");
     } catch (error) {
       console.error("Form submission error", error);

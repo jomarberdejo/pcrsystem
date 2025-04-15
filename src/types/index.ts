@@ -37,7 +37,9 @@ export interface PersonnelType {
   id: string;
   name: string;
   team: Team;
-  role: PersonnelRole,
+  role: PersonnelRole;
+  status: "ARCHIVED" | "ACTIVE";
+  archivedAt: string;
   totalTransportCases: number;
   totalEmergencyCases: number;
   totalNumberOfOperations: number;

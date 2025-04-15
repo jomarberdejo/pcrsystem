@@ -19,11 +19,18 @@ enum Team {
   ALPHA
 }
 
+enum Status {
+  ACTIVE
+  ARCHIVED
+}
+
 model Personnel {
   id              String        @id @default(uuid()) @db.Uuid
   name            String
   role            PersonnelRole
   team            Team?
+  status          Status        @default(ACTIVE)
+  archivedAt      String?
   recordsAsDriver Record[]      @relation("DriverRecords")
   recordsAsCrew   RecordCrew[]  @relation("CrewRecords")
 }
@@ -37,22 +44,22 @@ enum PersonnelRole {
 model Record {
   id                String        @id @default(uuid()) @db.Uuid
   date              DateTime
-  timeCalled        String
-  timeDispatched    String
-  timeAtScene       String
-  timeTransport     String
-  timeEndorsed      String
-  timeArrivedAt     String
-  typeOfIncident    String
-  placeOfIncident   String
-  receivingFacility String
-  typeOfConduction  String
+  timeCalled        String?
+  timeDispatched    String?
+  timeAtScene       String?
+  timeTransport     String?
+  timeEndorsed      String?
+  timeArrivedAt     String?
+  typeOfIncident    String?
+  placeOfIncident   String?
+  receivingFacility String?
+  typeOfConduction  String?
   vehiclesInvolved  String        @default("None")
   chiefComplaint    String
   noOfCasualty      String
   remarks           String
   vehicleUsed       String
-  documentation     Json          @db.JsonB
+  documentation     Json?         @db.JsonB
   operationType     OperationType
   ambulanceDriverId String?       @db.Uuid
   ambulanceDriver   Personnel?    @relation("DriverRecords", fields: [ambulanceDriverId], references: [id], onDelete: SetNull)

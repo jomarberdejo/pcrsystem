@@ -1,0 +1,12 @@
+-- AlterTable
+ALTER TABLE "Record" ALTER COLUMN "typeOfIncident" DROP NOT NULL,
+ALTER COLUMN "placeOfIncident" DROP NOT NULL,
+ALTER COLUMN "receivingFacility" DROP NOT NULL,
+ALTER COLUMN "typeOfConduction" DROP NOT NULL,
+ALTER COLUMN "documentation" DROP NOT NULL,
+ALTER COLUMN "timeCalled" DROP NOT NULL,
+ALTER COLUMN "timeDispatched" DROP NOT NULL,
+ALTER COLUMN "timeAtScene" DROP NOT NULL,
+ALTER COLUMN "timeTransport" DROP NOT NULL,
+ALTER COLUMN "timeEndorsed" DROP NOT NULL,
+ALTER COLUMN "timeArrivedAt" DROP NOT NULL;

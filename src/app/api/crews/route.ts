@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { OperationType, PersonnelRole, Team } from "@prisma/client";
+import { OperationType, PersonnelRole, Status, Team } from "@prisma/client";
 
 export interface CrewResponse {
   id: string;
   name: string;
-  team: Team | null,
-  role: PersonnelRole,
+  team: Team | null;
+  role: PersonnelRole;
+  status: Status;
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -29,6 +30,7 @@ export async function GET(): Promise<NextResponse> {
       name: true,
       team: true,
       role: true,
+      status: true,
       recordsAsCrew: {
         select: {
           record: {
@@ -64,6 +66,7 @@ export async function GET(): Promise<NextResponse> {
       name: person.name,
       team: person.team,
       role: person.role,
+      status: person.status,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
@@ -81,15 +84,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { name, team } = await request.json();
 
-    if (!name || !team) {
-      return NextResponse.json({ error: "Name or Team is required" }, { status: 400 });
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
     const newCrew = await prisma.personnel.create({
       data: {
         name,
-        team,
         role: PersonnelRole.CREW,
+        ...(team && { team }),
       },
     });
 
@@ -102,10 +105,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(newCrewData, { status: 201 });
   } catch (error) {
-    console.error(error)
+    console.error(error);
     return NextResponse.json({ error: "Failed to create crew" }, { status: 500 });
   }
 }
+
 
 
 

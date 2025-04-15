@@ -27,11 +27,14 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import momentPH from "@/lib/moment";
 
 const editFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  team: z.string().min(1, "Team is required"),
+  team: z.string().optional(),
   role: z.string().min(1, "Role/Designation is required"),
+  status: z.enum(["ACTIVE", "ARCHIVED"]),
+  archivedAt: z.string().optional(),
 });
 
 type EditPersonnelProps = {
@@ -55,6 +58,8 @@ export default function EditPersonnel({
       name: "",
       team: "",
       role: "",
+      status: "ACTIVE",
+      archivedAt: "",
     },
   });
 
@@ -64,6 +69,8 @@ export default function EditPersonnel({
         name: selectedPersonnel.name,
         team: selectedPersonnel.team || "",
         role: selectedPersonnel.role || "",
+        status: selectedPersonnel.archivedAt ? "ARCHIVED" : "ACTIVE",
+        archivedAt: selectedPersonnel.archivedAt || "",
       });
     }
   }, [selectedPersonnel, form]);
@@ -72,6 +79,12 @@ export default function EditPersonnel({
     if (!selectedPersonnel) return;
 
     try {
+      if (data.status === "ARCHIVED") {
+        data.archivedAt = momentPH().format("MMMM D, YYYY");
+      } else {
+        data.archivedAt = "";
+      }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/${personnelType}/${selectedPersonnel.id}`,
         {
@@ -157,6 +170,29 @@ export default function EditPersonnel({
                         <SelectItem value="DRIVER">DRIVER</SelectItem>
                         <SelectItem value="CREW">CREW</SelectItem>
                         <SelectItem value="BOTH">DRIVER/CREW</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Status Field */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                        <SelectItem value="ARCHIVED">ARCHIVED</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>

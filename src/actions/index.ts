@@ -27,66 +27,74 @@ async function uploadToCloudinary(file: File): Promise<string> {
     });
 }
 
-
 export async function createPCRCaseRecord(formData: FormData) {
     const operationType = formData.get("operationType") as OperationType;
     const date = new Date(formData.get("date") as string);
-    const typeOfIncident = formData.get("typeOfIncident") as string;
-    const placeOfIncident = formData.get("placeOfIncident") as string;
-    const receivingFacility = formData.get("receivingFacility") as string;
-    const typeOfConduction = formData.get("typeOfConduction") as string;
+
+    // Required fields
     const chiefComplaint = formData.get("chiefComplaint") as string;
     const noOfCasualty = formData.get("noOfCasualty") as string;
     const remarks = formData.get("remarks") as string;
     const vehicleUsed = formData.get("vehicleUsed") as string;
-    const ambulanceDriverId = formData.get("ambulanceDriver") as string;
-    const vehiclesInvolved = formData.getAll("vehiclesInvolved") as string[];
+
+    // Optional fields
+    const typeOfIncident = formData.get("typeOfIncident") as string | null;
+    const placeOfIncident = formData.get("placeOfIncident") as string | null;
+    const receivingFacility = formData.get("receivingFacility") as string | null;
+    const typeOfConduction = formData.get("typeOfConduction") as string | null;
+    const ambulanceDriverId = formData.get("ambulanceDriver") as string | null;
+
+    const vehiclesInvolvedArray = formData.getAll("vehiclesInvolved") as string[];
+    const vehiclesInvolved = vehiclesInvolvedArray.length
+        ? vehiclesInvolvedArray.join(", ")
+        : "None";
+
     const ambulanceCrewsId = formData.getAll("ambulanceCrew") as string[];
 
-    const timeCalled = formatTimeInManila(formData.get("timeCalled") as string);
-    const timeDispatched = formatTimeInManila(formData.get("timeDispatched") as string);
-    const timeAtScene = formatTimeInManila(formData.get("timeAtScene") as string);
-    const timeTransport = formatTimeInManila(formData.get("timeTransport") as string);
-    const timeEndorsed = formatTimeInManila(formData.get("timeEndorsed") as string);
-    const timeArrivedAt = formatTimeInManila(formData.get("timeArrivedAt") as string);
+    const getTime = (field: string): string | null => {
+        const value = formData.get(field);
+        return value ? formatTimeInManila(value as string) : null;
+    };
+
+    const timeCalled = getTime("timeCalled");
+    const timeDispatched = getTime("timeDispatched");
+    const timeAtScene = getTime("timeAtScene");
+    const timeTransport = getTime("timeTransport");
+    const timeEndorsed = getTime("timeEndorsed");
+    const timeArrivedAt = getTime("timeArrivedAt");
 
     const documentationFiles = formData.getAll("documentation") as File[];
-
-    const documentation = await Promise.all(
-        documentationFiles.map(uploadToCloudinary)
-    );
-
+    const documentation =
+        documentationFiles.length > 0
+            ? await Promise.all(documentationFiles.map(uploadToCloudinary))
+            : [];
 
     await prisma.record.create({
         data: {
-            operationType: operationType || "",
+            operationType,
             date,
-            typeOfIncident,
-            placeOfIncident,
-            receivingFacility,
-            typeOfConduction,
             chiefComplaint,
             noOfCasualty,
             remarks,
             vehicleUsed,
-            ambulanceDriver: {
-                connect: { id: ambulanceDriverId },
-            },
-            ...(vehiclesInvolved.length > 0 && {
-                vehiclesInvolved: vehiclesInvolved.join(", "),
-            }),
-            ambulanceCrews: {
-                create: ambulanceCrewsId.map((crewId: string) => ({
-                    crew: { connect: { id: crewId } },
-                })),
-            },
-            documentation,
+            typeOfIncident: typeOfIncident || null,
+            placeOfIncident: placeOfIncident || null,
+            receivingFacility: receivingFacility || null,
+            typeOfConduction: typeOfConduction || null,
+            ambulanceDriverId: ambulanceDriverId || null,
+            vehiclesInvolved,
             timeCalled,
             timeDispatched,
             timeAtScene,
             timeTransport,
             timeEndorsed,
             timeArrivedAt,
+            documentation: documentation.length > 0 ? documentation : undefined,
+            ambulanceCrews: {
+                create: ambulanceCrewsId.map((id: string) => ({
+                    crew: { connect: { id } },
+                })),
+            },
         },
     });
 

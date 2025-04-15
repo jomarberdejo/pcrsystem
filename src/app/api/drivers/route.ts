@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { OperationType, PersonnelRole, Team } from "@prisma/client";
+import { OperationType, PersonnelRole, Status, Team } from "@prisma/client";
 
 export interface DriverResponse {
   id: string;
   name: string;
-  team: Team | null,
-  role: PersonnelRole,
+  team: Team | null;
+  role: PersonnelRole;
+  status: Status;
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -29,6 +30,7 @@ export async function GET(): Promise<NextResponse> {
       name: true,
       team: true,
       role: true,
+      status: true,
       recordsAsDriver: {
         select: {
           operationType: true,
@@ -67,6 +69,7 @@ export async function GET(): Promise<NextResponse> {
       name: person.name,
       team: person.team,
       role: person.role,
+      status: person.status,
       totalNumberOfOperations,
       totalEmergencyCases,
       totalTransportCases,
@@ -86,28 +89,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const { name, team } = await request.json();
 
-    if (!name || !team) {
-      return NextResponse.json({ error: "Name or Team is required" }, { status: 400 });
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const newPersonnel = await prisma.personnel.create({
+    const newDriver = await prisma.personnel.create({
       data: {
         name,
-        team,
         role: PersonnelRole.DRIVER,
+        ...(team && { team }),
       },
     });
 
-    const newPersonnelData = {
-      ...newPersonnel,
+    const newDriverData = {
+      ...newDriver,
       totalNumberOfOperations: 0,
       totalEmergencyCases: 0,
       totalTransportCases: 0,
     };
 
-    return NextResponse.json(newPersonnelData, { status: 201 });
+    return NextResponse.json(newDriverData, { status: 201 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Failed to create personnel" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create driver" }, { status: 500 });
   }
 }
+

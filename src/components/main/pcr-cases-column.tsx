@@ -130,44 +130,52 @@ export const columns: ColumnDef<PCRReportType>[] = [
   {
     accessorKey: "documentation",
     header: "Documentation",
-    cell: ({ row }) => (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Image
-            alt="image-identity"
-            width={400}
-            height={400}
-            src={`${row.original.documentation[0]}`}
-            loading="lazy"
-            className="rounded-full h-[60px] w-[60px] object-cover cursor-pointer"
-          />
-        </DialogTrigger>
-        <DialogContent className="h-auto max-h-[80vh] max-w-3xl flex flex-col items-center justify-center py-6 px-4 gap-4">
-          <DialogHeader className="text-center w-full">
-            <DialogTitle>{`Documentation (${row.original.documentation.length} Files) - ${row.original.date}`}</DialogTitle>
-          </DialogHeader>
-          <Carousel className="w-full max-w-2xl mx-auto">
-            <CarouselContent>
-              {row.original.documentation.map((url, i) => (
-                <CarouselItem key={i} className="flex justify-center">
-                  <div className="p-2 flex justify-center">
-                    <Image
-                      alt={`Documentation ${i + 1}`}
-                      height={600}
-                      width={600}
-                      src={url}
-                      loading="lazy"
-                      className="max-w-full max-h-[70vh] object-contain"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </DialogContent>
-      </Dialog>
-    ),
+    cell: ({ row }) => {
+      const documentation = row.original.documentation;
+
+      if (!documentation || documentation.length === 0) {
+        return <span>No documentation available</span>;
+      }
+
+      return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Image
+              alt="image-identity"
+              width={400}
+              height={400}
+              src={`${documentation[0]}`}
+              loading="lazy"
+              className="rounded-full h-[60px] w-[60px] object-cover cursor-pointer"
+            />
+          </DialogTrigger>
+          <DialogContent className="h-auto max-h-[80vh] max-w-3xl flex flex-col items-center justify-center py-6 px-4 gap-4">
+            <DialogHeader className="text-center w-full">
+              <DialogTitle>{`Documentation (${documentation.length} Files) - ${row.original.date}`}</DialogTitle>
+            </DialogHeader>
+            <Carousel className="w-full max-w-2xl mx-auto">
+              <CarouselContent>
+                {documentation.map((url, i) => (
+                  <CarouselItem key={i} className="flex justify-center">
+                    <div className="p-2 flex justify-center">
+                      <Image
+                        alt={`Documentation ${i + 1}`}
+                        height={600}
+                        width={600}
+                        src={url}
+                        loading="lazy"
+                        className="max-w-full max-h-[70vh] object-contain"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </DialogContent>
+        </Dialog>
+      );
+    },
   },
 ];

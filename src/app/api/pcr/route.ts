@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { formatDateDisplay, formatTimeInManila } from "@/lib/utils";
+import { formatDateDisplay } from "@/lib/utils";
 import momentPH from "@/lib/moment";
-function computeTimeDiff(startTime: string, endTime: string): string {
+function computeTimeDiff(startTime?: string | null, endTime?: string | null): string {
+  if (!startTime || !endTime) return ""; // Return empty if either time is missing
+
   const format = "h:mm A";
   const start = momentPH(startTime, format);
   const end = momentPH(endTime, format);
@@ -21,6 +23,7 @@ function computeTimeDiff(startTime: string, endTime: string): string {
 
   return `${diffInMinutes} mins`;
 }
+
 
 export async function GET() {
   const records = await prisma.record.findMany({
