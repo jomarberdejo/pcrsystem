@@ -109,7 +109,7 @@ export const LoginForm = () => {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Your Username..."
+                  placeholder="your username..."
                   autoComplete="current-username"
                   value={credentials.username}
                   onChange={(e) =>
@@ -143,7 +143,7 @@ export const LoginForm = () => {
                   type={passwordVisible ? "text" : "password"}
                   autoComplete="current-password"
                   value={credentials.password}
-                  placeholder="Your password..."
+                  placeholder="your password..."
                   onChange={(e) =>
                     setCredentials({
                       ...credentials,

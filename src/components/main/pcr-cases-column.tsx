@@ -15,8 +15,25 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { MoreHorizontal, PenIcon } from "lucide-react";
+import { Button } from "../ui/button";
 
-export const columns: ColumnDef<PCRReportType>[] = [
+type Props = {
+  setSelectedPCR: (pcr: PCRReportType) => void;
+  setModalOpen: (value: boolean) => void;
+};
+
+export const columns = ({
+  setSelectedPCR,
+  setModalOpen,
+}: Props): ColumnDef<PCRReportType>[] => [
   // {
   //   accessorKey: "id",
   //   header: "PCR Case ID",
@@ -175,6 +192,40 @@ export const columns: ColumnDef<PCRReportType>[] = [
             </Carousel>
           </DialogContent>
         </Dialog>
+      );
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const personnel = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel className="text-center">
+              Actions
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setSelectedPCR(personnel);
+                setModalOpen(true);
+              }}
+            >
+              <PenIcon className="w-[16px] mr-2" />
+              Edit
+            </Button>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },
