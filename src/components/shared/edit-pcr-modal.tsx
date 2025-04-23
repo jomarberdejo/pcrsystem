@@ -46,6 +46,9 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
+import momentPH from "@/lib/moment";
+import { parseTimeStringToDate } from "@/lib/utils";
+import { updatePCRCaseRecord } from "@/actions";
 
 // const editFormSchema = z.object({
 //   name: z.string().min(1, "Name is required"),
@@ -71,7 +74,7 @@ export default function EditPCRModal({
   const [operationType, setOperationType] = useState<
     "EMERGENCY" | "TRANSPORT" | ""
   >("");
-  const { driverOptions, crewOptions, isLoading, isError } = useOptions();
+  const { driverOptions, crewOptions, isError } = useOptions();
 
   const filteredIncidentTypes = incidentTypeList.filter(({ type }) =>
     operationType ? type === operationType : undefined
@@ -106,58 +109,120 @@ export default function EditPCRModal({
   useEffect(() => {
     if (selectedPCR) {
       setOperationType(selectedPCR.operationType);
+
+      const selectedCrewNames =
+        selectedPCR.ambulanceCrews?.split(",").map((name) => name.trim()) || [];
+
+      const selectedCrewIds = crewOptions
+        .filter((option) => selectedCrewNames.includes(option.name))
+        .map((option) => option.id);
+
+      const selectedDriver = driverOptions.find(
+        (option) => option.name === selectedPCR.ambulanceDriver
+      );
+      const selectedDriverId = selectedDriver ? selectedDriver.id : "";
+      const format = "YYYY MMMM DD (dddd)";
       form.reset({
         operationType: selectedPCR.operationType,
-        date: undefined,
-        timeCalled: undefined,
-        timeDispatched: undefined,
-        timeAtScene: undefined,
-        timeTransport: undefined,
-        timeEndorsed: undefined,
-        timeArrivedAt: undefined,
+        date: momentPH(selectedPCR.date, format).toDate(),
+        timeCalled: parseTimeStringToDate(selectedPCR.timeCalled) || undefined,
+        timeDispatched:
+          parseTimeStringToDate(selectedPCR.timeDispatched) || undefined,
+        timeAtScene:
+          parseTimeStringToDate(selectedPCR.timeAtScene) || undefined,
+        timeTransport:
+          parseTimeStringToDate(selectedPCR.timeTransport) || undefined,
+        timeEndorsed:
+          parseTimeStringToDate(selectedPCR.timeEndorsed) || undefined,
+        timeArrivedAt:
+          parseTimeStringToDate(selectedPCR.timeArrivedAt) || undefined,
         typeOfIncident: selectedPCR.typeOfIncident,
         placeOfIncident: selectedPCR.placeOfIncident,
         receivingFacility: selectedPCR.receivingFacility,
         typeOfConduction: selectedPCR.typeOfConduction,
         vehiclesInvolved: [],
         chiefComplaint: selectedPCR.chiefComplaint,
-        noOfCasualty: "",
+        noOfCasualty: selectedPCR.noOfCasualty,
         remarks: selectedPCR.remarks,
         vehicleUsed: selectedPCR.vehicleUsed,
-        ambulanceDriver: selectedPCR.ambulanceDriver,
-        ambulanceCrew: [],
+        ambulanceDriver: selectedDriverId,
+        ambulanceCrew: selectedCrewIds,
         documentation: [],
       });
     }
   }, [selectedPCR, form]);
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!selectedPCR) return;
-
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/pcr/${selectedPCR.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const formData = new FormData();
 
-      if (!res.ok) {
-        throw new Error("Failed to update personnel");
+      formData.append("operationType", values.operationType);
+      formData.append("date", values.date.toISOString());
+
+      if (values.timeCalled)
+        formData.append("timeCalled", values.timeCalled.toISOString());
+      if (values.timeDispatched)
+        formData.append("timeDispatched", values.timeDispatched.toISOString());
+      if (values.timeAtScene)
+        formData.append("timeAtScene", values.timeAtScene.toISOString());
+      if (values.timeTransport)
+        formData.append("timeTransport", values.timeTransport.toISOString());
+      if (values.timeEndorsed)
+        formData.append("timeEndorsed", values.timeEndorsed.toISOString());
+      if (values.timeArrivedAt)
+        formData.append("timeArrivedAt", values.timeArrivedAt.toISOString());
+
+      if (values.typeOfIncident)
+        formData.append("typeOfIncident", values.typeOfIncident);
+      if (values.placeOfIncident)
+        formData.append("placeOfIncident", values.placeOfIncident);
+      if (values.receivingFacility)
+        formData.append("receivingFacility", values.receivingFacility);
+      if (values.typeOfConduction)
+        formData.append("typeOfConduction", values.typeOfConduction);
+      if (values.chiefComplaint)
+        formData.append("chiefComplaint", values.chiefComplaint);
+      if (values.noOfCasualty)
+        formData.append("noOfCasualty", values.noOfCasualty);
+      if (values.remarks) formData.append("remarks", values.remarks);
+      if (values.vehicleUsed)
+        formData.append("vehicleUsed", values.vehicleUsed);
+      if (values.ambulanceDriver)
+        formData.append("ambulanceDriver", values.ambulanceDriver);
+
+      if (values.vehiclesInvolved) {
+        values.vehiclesInvolved.forEach((vehicle) =>
+          formData.append("vehiclesInvolved", vehicle)
+        );
       }
 
-      toast.success("Personnel updated!");
+      if (values.ambulanceCrew?.length > 0) {
+        values.ambulanceCrew.forEach((crew) =>
+          formData.append("ambulanceCrew", crew)
+        );
+      }
+
+      if (values.documentation && values.documentation.length > 0) {
+        values.documentation.forEach((file: File) =>
+          formData.append("documentation", file)
+        );
+      }
+
+      await updatePCRCaseRecord(selectedPCR?.id, formData);
+
+      toast.success("PCR case updated successfully!", {
+        description: "The PCR case has been successfully updated.",
+        position: "top-right",
+      });
+
       mutate();
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update personnel.");
+      console.error("Form submission error", error);
+      toast.error("Failed to submit the form. Please try again.");
     }
-  };
+  }
 
   const dropZoneConfig = {
     maxFiles: 5,
@@ -630,7 +695,7 @@ export default function EditPCRModal({
                 />
               </div>
 
-              <div className="col-span-4">
+              {/* <div className="col-span-4">
                 <FormField
                   control={form.control}
                   name="documentation"
@@ -677,7 +742,7 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
             </div>
 
             <Button

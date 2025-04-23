@@ -45,12 +45,12 @@ export function PCRCaseClient() {
         hasDateRange={true}
       />
 
-      {/* <EditPCRModal
+      <EditPCRModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         selectedPCR={selectedPCR}
         mutate={mutate}
-      /> */}
+      />
     </>
   );
 }

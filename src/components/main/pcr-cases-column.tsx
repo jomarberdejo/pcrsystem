@@ -177,11 +177,11 @@ export const columns = ({
                     <div className="p-2 flex justify-center">
                       <Image
                         alt={`Documentation ${i + 1}`}
-                        height={600}
-                        width={600}
+                        height={700}
+                        width={400}
                         src={url}
                         loading="lazy"
-                        className="max-w-full max-h-[70vh] object-contain"
+                        className="w-full max-h-[65vh] object-cover"
                       />
                     </div>
                   </CarouselItem>

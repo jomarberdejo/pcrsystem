@@ -1,9 +1,9 @@
-import moment from "moment";
+import momentPH from "@/lib/moment";
 
 export function getCurrentMonthCases(data: any[]): number {
-    const currentMonth = moment().month();
+    const currentMonth = momentPH().month();
     return data.filter(
-        (record) => moment(record.date, "YYYY MMMM DD (dddd)").month() === currentMonth
+        (record) => momentPH(record.date, "YYYY MMMM DD (dddd)").month() === currentMonth
     ).length;
 }
 

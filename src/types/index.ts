@@ -1,5 +1,42 @@
-import { PersonnelRole, Team } from "@prisma/client";
-import { type LucideIcon } from "lucide-react"
+import { OperationType, PersonnelRole, Team } from "@prisma/client";
+import { type LucideIcon } from "lucide-react";
+
+type TimeProperties = {
+  timeCalled?: string | null;
+  timeDispatched?: string | null;
+  timeAtScene?: string | null;
+  timeTransport?: string | null;
+  timeEndorsed?: string | null;
+  timeArrivedAt?: string | null;
+};
+
+type Documentation = {
+  documentation?: string[];
+};
+
+type IncidentProperties = {
+  typeOfIncident?: string | null;
+  placeOfIncident?: string | null;
+  receivingFacility?: string | null;
+  typeOfConduction?: string | null;
+};
+
+type OperationProperties = {
+  operationType?: OperationType;
+  date?: Date;
+  chiefComplaint?: string;
+  noOfCasualty?: string;
+  remarks?: string;
+  vehicleUsed?: string;
+  vehiclesInvolved?: string;
+  ambulanceDriverId?: string | null;
+};
+
+export interface PCRCaseRecordUpdateData
+  extends TimeProperties,
+  IncidentProperties,
+  OperationProperties,
+  Documentation { }
 
 export type NavItemsType = {
   title: string;
@@ -8,7 +45,7 @@ export type NavItemsType = {
 }
 
 export type PCRReportType = {
-  id: number;
+  id: string;
   operationType: "TRANSPORT" | "EMERGENCY";
   date: string;
   timeCalled: string;
@@ -23,7 +60,7 @@ export type PCRReportType = {
   typeOfConduction: string;
   vehiclesInvolved: string;
   chiefComplaint: string;
-  noOfCasualty: number;
+  noOfCasualty: string;
   remarks: string;
   vehicleUsed: string;
   ambulanceDriver: string;
@@ -48,8 +85,6 @@ export interface PersonnelType {
     operationType: "EMERGENCY" | "TRANSPORT";
   }[];
 }
-
-
 
 export type StaffFormPropType = {
   children: React.ReactNode;

@@ -17,3 +17,12 @@ export function formatDateDisplay(date: string | Date): string {
 export function formatTimeInManila(date?: string | Date): string {
   return momentPH(date).format("hh:mm A");
 }
+
+export const parseTimeStringToDate = (timeString: string) => {
+  if (!timeString) return undefined;
+
+  const today = momentPH().format("YYYY-MM-DD");
+  const fullDateTimeString = `${today} ${timeString}`;
+  const parsed = momentPH(fullDateTimeString, "YYYY-MM-DD hh:mm A");
+  return parsed.isValid() ? parsed.toDate() : undefined;
+};

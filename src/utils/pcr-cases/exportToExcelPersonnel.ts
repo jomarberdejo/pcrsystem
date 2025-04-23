@@ -1,11 +1,10 @@
+import momentPH from "@/lib/moment";
 import { PersonnelType } from "@/types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import moment from "moment-timezone";
 
-// Format a date to "Month YYYY" using Asia/Manila timezone
 const formatMonthYear = (dateString: string) => {
-  return moment.tz(dateString, "Asia/Manila").format("MMMM YYYY");
+  return momentPH().format("MMMM YYYY");
 };
 
 export const exportToExcelPersonnel = async (
@@ -27,7 +26,6 @@ export const exportToExcelPersonnel = async (
     }>
   > = {};
 
-  // Step 1: Populate dataMap with real data + track unique months & names
   filteredData.forEach((staff) => {
     allStaffNames.add(staff.name);
 
@@ -60,7 +58,6 @@ export const exportToExcelPersonnel = async (
     });
   });
 
-  // Step 2: Ensure all staff exist for all months (even if they have 0s)
   allMonthYears.forEach((monthYear) => {
     if (!dataMap[monthYear]) {
       dataMap[monthYear] = {};
@@ -78,11 +75,10 @@ export const exportToExcelPersonnel = async (
     });
   });
 
-  // Step 3: Sort and export sheets
   const sortedMonthKeys = Array.from(allMonthYears).sort(
     (a, b) =>
-      moment(a, "MMMM YYYY").toDate().getTime() -
-      moment(b, "MMMM YYYY").toDate().getTime()
+      momentPH(a, "MMMM YYYY").toDate().getTime() -
+      momentPH(b, "MMMM YYYY").toDate().getTime()
   );
 
   sortedMonthKeys.forEach((monthYear) => {
@@ -122,6 +118,6 @@ export const exportToExcelPersonnel = async (
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
 
-  saveAs(blob, `${exportTitle}_${moment().tz("Asia/Manila").format("YYYY-MM-DD")}.xlsx`);
+  saveAs(blob, `${exportTitle}_${momentPH().format("YYYY-MM-DD")}.xlsx`);
 };
 

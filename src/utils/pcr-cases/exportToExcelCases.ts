@@ -1,7 +1,7 @@
+import momentPH from "@/lib/moment";
 import { PCRReportType } from "@/types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import moment from "moment-timezone";
 
 const aggregatePersonnelData = (filteredData: PCRReportType[]) => {
   const personnelStats = new Map<string, { totalOps: number; transportCases: number; emergencyCases: number }>();
@@ -39,7 +39,7 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
   const workbook = new ExcelJS.Workbook();
 
   const groupedByMonth = filteredData.reduce((acc, report) => {
-    const date = moment(report.date, "YYYY MMMM DD (dddd)");
+    const date = momentPH(report.date, "YYYY MMMM DD (dddd)");
     const readableMonthYear = date.format("MMMM YYYY");
 
     if (!acc[readableMonthYear]) {
@@ -51,17 +51,16 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
   }, {} as Record<string, PCRReportType[]>);
 
   const sortedMonthKeys = Object.keys(groupedByMonth).sort((a, b) =>
-    moment(a, "MMMM YYYY").diff(moment(b, "MMMM YYYY"))
+    momentPH(a, "MMMM YYYY").diff(momentPH(b, "MMMM YYYY"))
   );
 
-  // Style config
   const headerStyle = {
     font: { bold: true, size: 12, name: "Calibri" },
     alignment: { vertical: "middle", horizontal: "center" },
     fill: {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "FFF6C1C1" }, // light pink
+      fgColor: { argb: "FFF6C1C1" },
     },
     border: {
       top: { style: "thin" },
@@ -71,7 +70,6 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
     },
   };
 
-  // Create monthly sheets
   sortedMonthKeys.forEach((monthYear) => {
     const worksheet = workbook.addWorksheet(monthYear);
 
@@ -100,7 +98,6 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
       { header: "Documentation", key: "documentation", width: 40 },
     ];
 
-    // Add data rows
     groupedByMonth[monthYear].forEach((report) => {
       const row = worksheet.addRow({
         ...report,
@@ -125,7 +122,6 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
       }
     });
 
-    // Style header
     const headerRow = worksheet.getRow(1);
     headerRow.height = 20;
     headerRow.eachCell((cell) => Object.assign(cell, headerStyle));
@@ -154,7 +150,6 @@ export const exportToExcelAdvanced = async (filteredData: PCRReportType[], expor
   summaryHeader.height = 20;
   summaryHeader.eachCell((cell) => Object.assign(cell, headerStyle));
 
-  // Save file
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

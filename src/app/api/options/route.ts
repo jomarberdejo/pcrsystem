@@ -15,6 +15,9 @@ export async function GET() {
             name: true,
             role: true,
         },
+        orderBy: {
+            name: "asc"
+        }
     });
 
     const result = personnel.map(mapPersonnelRole);
