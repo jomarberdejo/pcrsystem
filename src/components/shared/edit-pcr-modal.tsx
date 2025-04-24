@@ -107,7 +107,9 @@ export default function EditPCRModal({
   });
 
   useEffect(() => {
+    console.log("RENDERED ");
     if (selectedPCR) {
+      console.log("SELECTED PCR");
       setOperationType(selectedPCR.operationType);
 
       const selectedCrewNames =

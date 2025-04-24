@@ -4,6 +4,8 @@ import * as React from "react";
 import { TimePickerInput } from "./time-picker-input";
 import { TimePeriodSelect } from "./period-select";
 import { Period } from "@/utils/timepicker/time-picker-utils";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface TimePickerDemoProps {
   date: Date | undefined;
@@ -26,60 +28,50 @@ export function TimePickerDemo({ date, setDate }: TimePickerDemoProps) {
 
   return (
     <div className="flex items-end gap-2">
-      <div className="grid gap-1 text-center">
-        {/* <Label htmlFor="hours" className="text-xs">
-          Hours
-        </Label> */}
-        <TimePickerInput
-          picker="12hours"
-          period={period}
-          date={date}
-          setDate={setDate}
-          ref={hourRef}
-          onRightFocus={() => minuteRef.current?.focus()}
-        />
+      <div className="flex items-end gap-2">
+        <div className="grid gap-1 text-center">
+          <TimePickerInput
+            picker="12hours"
+            period={period}
+            date={date}
+            setDate={setDate}
+            ref={hourRef}
+            onRightFocus={() => minuteRef.current?.focus()}
+          />
+        </div>
+        <div className="grid gap-1 text-center">
+          <TimePickerInput
+            picker="minutes"
+            id="minutes12"
+            date={date}
+            setDate={setDate}
+            ref={minuteRef}
+            onLeftFocus={() => hourRef.current?.focus()}
+            onRightFocus={() => secondRef.current?.focus()}
+          />
+        </div>
+        <div className="grid gap-1 text-center">
+          <TimePeriodSelect
+            period={period}
+            setPeriod={setPeriod}
+            date={date}
+            setDate={setDate}
+            ref={periodRef}
+            onLeftFocus={() => secondRef.current?.focus()}
+          />
+        </div>
       </div>
-      <div className="grid gap-1 text-center">
-        {/* <Label htmlFor="minutes" className="text-xs">
-          Minutes
-        </Label> */}
-        <TimePickerInput
-          picker="minutes"
-          id="minutes12"
-          date={date}
-          setDate={setDate}
-          ref={minuteRef}
-          onLeftFocus={() => hourRef.current?.focus()}
-          onRightFocus={() => secondRef.current?.focus()}
-        />
-      </div>
-      {/* <div className="grid gap-1 text-center">
-        <Label htmlFor="seconds" className="text-xs">
-          Seconds
-        </Label>
-        <TimePickerInput
-          picker="seconds"
-          id="seconds12"
-          date={date}
-          setDate={setDate}
-          ref={secondRef}
-          onLeftFocus={() => minuteRef.current?.focus()}
-          onRightFocus={() => periodRef.current?.focus()}
-        />
-      </div> */}
-      <div className="grid gap-1 text-center">
-        {/* <Label htmlFor="period" className="text-xs">
-          Period
-        </Label> */}
-        <TimePeriodSelect
-          period={period}
-          setPeriod={setPeriod}
-          date={date}
-          setDate={setDate}
-          ref={periodRef}
-          onLeftFocus={() => secondRef.current?.focus()}
-        />
-      </div>
+      {date && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 ml-2"
+          onClick={() => setDate(undefined)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 }
