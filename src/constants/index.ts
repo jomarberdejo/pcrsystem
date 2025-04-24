@@ -152,4 +152,5 @@ export const typeOfConduction = [
     "Pedestrian/ Road Accident to Hospital",
     "School to Hospital",
     "Refusal to Transport",
+    "Others (RT Transport)"
 ];
