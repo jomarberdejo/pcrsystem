@@ -696,7 +696,7 @@ export default function EditPCRModal({
                 />
               </div>
 
-             <div className="col-span-4">
+              <div className="col-span-4">
                 <FormField
                   control={form.control}
                   name="documentation"
@@ -743,7 +743,7 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
-              </div> 
+              </div>
             </div>
 
             <Button
@@ -754,12 +754,12 @@ export default function EditPCRModal({
               {form.formState.isSubmitting ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  <span>Saving...</span>
+                  <span>Updating...</span>
                 </>
               ) : (
                 <>
                   <Check className="mr-2 h-4 w-4" />
-                  <span>Save</span>
+                  <span>Update Now</span>
                 </>
               )}
             </Button>
