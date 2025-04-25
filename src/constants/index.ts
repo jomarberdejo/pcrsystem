@@ -92,7 +92,7 @@ export const placeOfIncidentAndReceivingFacilities = [
     "Manloy",
     "Montesclaros' Clinic",
     "Mother of Mercy Hospital-Tacloban, Inc.",
-    "Nauguissan",
+    "Nauguisan",
     "Nephroline Dialysis Center",
     "Operation Center",
     "Ormoc District Hospital",
