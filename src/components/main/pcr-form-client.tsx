@@ -39,7 +39,7 @@ import { createPCRCaseRecord } from "@/actions";
 import { useOptions } from "@/hooks/use-options";
 import { DatePicker } from "@/components/date-picker";
 import { TimePickerDemo } from "@/components/timepicker";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { formSchema } from "@/schemas";
 import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
 import { FormsSkeleton } from "@/components/skeletons/forms-skeleton";
@@ -48,7 +48,7 @@ export function PCRFormClient() {
   const [operationType, setOperationType] = useState<
     "EMERGENCY" | "TRANSPORT" | ""
   >("");
-  const router = useRouter();
+  // const router = useRouter();
   const { driverOptions, crewOptions, isLoading, isError } = useOptions();
 
   const filteredIncidentTypes = incidentTypeList.filter(({ type }) =>
@@ -145,7 +145,8 @@ export function PCRFormClient() {
         position: "top-right",
       });
 
-      router.push("/admin/pcr-cases");
+      // router.push("/admin/pcr-cases");
+      
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
