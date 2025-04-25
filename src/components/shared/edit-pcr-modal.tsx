@@ -121,6 +121,15 @@ export default function EditPCRModal({
       const selectedDriver = driverOptions.find(
         (option) => option.name === selectedPCR.ambulanceDriver
       );
+
+      const selectedVehicleNames =
+        selectedPCR.vehiclesInvolved?.split(",").map((name) => name.trim()) ||
+        [];
+
+      const selectedVehiclesInvolved = vehiclesInvolvedList
+        .filter((vehicle) => selectedVehicleNames.includes(vehicle.value))
+        .map((vehicle) => vehicle.value);
+
       const selectedDriverId = selectedDriver ? selectedDriver.id : "";
       const format = "YYYY MMMM DD (dddd)";
       form.reset({
@@ -141,7 +150,7 @@ export default function EditPCRModal({
         placeOfIncident: selectedPCR.placeOfIncident || "",
         receivingFacility: selectedPCR.receivingFacility || "",
         typeOfConduction: selectedPCR.typeOfConduction || "",
-        vehiclesInvolved: [],
+        vehiclesInvolved: selectedVehiclesInvolved,
         chiefComplaint: selectedPCR.chiefComplaint,
         noOfCasualty: selectedPCR.noOfCasualty,
         remarks: selectedPCR.remarks,
