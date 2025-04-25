@@ -47,6 +47,10 @@ export async function GET() {
       computationERTDispatch: computeTimeDiff(report.timeDispatched, report.timeArrivedAt),
       ambulanceDriver: report.ambulanceDriver?.name,
       ambulanceCrews: report.ambulanceCrews.map((rc) => rc.crew.name).join(", "),
+      documentation: Array.isArray(report.documentation)
+        ? report.documentation.map((doc: any) => doc.url)
+        : [],
+
     };
   });
 

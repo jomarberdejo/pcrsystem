@@ -145,7 +145,7 @@ export const columns = ({
     header: "ERT Dispatch to Arrival at Opcen",
   },
   {
-    accessorKey: "documentation",
+    accessorKey: "documentation.url",
     header: "Documentation",
     cell: ({ row }) => {
       const documentation = row.original.documentation;

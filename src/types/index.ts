@@ -11,7 +11,7 @@ type TimeProperties = {
 };
 
 type Documentation = {
-  documentation?: string[];
+  documentation?: { url: string; publicId: string }[];
 };
 
 type IncidentProperties = {

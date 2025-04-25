@@ -12,20 +12,28 @@ cloudinary.config({
     secure: true,
 });
 
-async function uploadToCloudinary(file: File): Promise<string> {
+async function uploadToCloudinary(file: File): Promise<{ url: string; publicId: string }> {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             { folder: "pcr_documents" },
             (error, result) => {
                 if (error) reject(error);
-                else resolve(result?.secure_url as string);
+                else resolve({ url: result!.secure_url, publicId: result!.public_id });
             }
         );
-
         file.arrayBuffer().then((buffer) => {
             uploadStream.end(Buffer.from(buffer));
         });
     });
+}
+
+const deleteFromCloudinary = (public_id: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.destroy(public_id, (err, res) => {
+            if (err) reject(err);
+            else resolve();
+        })
+    })
 }
 
 export async function createPCRCaseRecord(formData: FormData) {
@@ -67,6 +75,7 @@ export async function createPCRCaseRecord(formData: FormData) {
         documentationFiles.length > 0
             ? await Promise.all(documentationFiles.map(uploadToCloudinary))
             : [];
+
 
     await prisma.record.create({
         data: {
@@ -166,10 +175,19 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
 
     const documentationFiles = formData.getAll("documentation") as File[];
     if (documentationFiles.length > 0) {
-        const documentation = await Promise.all(
-            documentationFiles.map(uploadToCloudinary)
-        );
-        updateData.documentation = documentation;
+        const existingRecord = await prisma.record.findUnique({
+            where: { id },
+            select: { documentation: true },
+        });
+
+        if (existingRecord?.documentation) {
+            const oldDocs = existingRecord.documentation as Array<{ url: string; publicId: string }>;
+            await Promise.all(oldDocs.map(doc => deleteFromCloudinary(doc.publicId)));
+        }
+
+        const docUpload = await Promise.all(documentationFiles.map(uploadToCloudinary));
+        updateData.documentation = docUpload;
+
     }
 
     if (Object.keys(updateData).length > 0) {
