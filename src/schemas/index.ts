@@ -19,6 +19,6 @@ export const formSchema = z.object({
   remarks: z.string().min(1, "Remarks are required"),
   vehicleUsed: z.string().min(1, "Vehicle used is required"),
   ambulanceDriver: z.string().min(1, "Ambulance driver is required"),
-  ambulanceCrew: z.array(z.string()).min(1, "At least one ambulance crew member is required"),
+  ambulanceCrew: z.array(z.string()).optional(),
   documentation: z.array(z.instanceof(File)).optional(),
 });

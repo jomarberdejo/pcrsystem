@@ -98,11 +98,13 @@ export async function createPCRCaseRecord(formData: FormData) {
             timeEndorsed,
             timeArrivedAt,
             documentation: documentation.length > 0 ? documentation : undefined,
-            ambulanceCrews: {
-                create: ambulanceCrewsId.map((id: string) => ({
-                    crew: { connect: { id } },
-                })),
-            },
+            ...(ambulanceCrewsId.length > 0 && {
+                ambulanceCrews: {
+                    create: ambulanceCrewsId.map((id: string) => ({
+                        crew: { connect: { id } },
+                    })),
+                },
+            }),
         },
     });
 

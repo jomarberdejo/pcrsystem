@@ -125,7 +125,7 @@ export function PCRFormClient() {
         );
       }
 
-      if (values.ambulanceCrew?.length > 0) {
+      if (values.ambulanceCrew && values.ambulanceCrew.length > 0) {
         values.ambulanceCrew.forEach((crew) =>
           formData.append("ambulanceCrew", crew)
         );
