@@ -192,6 +192,8 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
 
     }
 
+    //SET TO NULL WHEN NO AMBULANCE CREW IN UPDATE
+
     if (Object.keys(updateData).length > 0) {
         await prisma.record.update({
             where: { id },

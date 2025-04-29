@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,17 +43,28 @@ import { TimePickerDemo } from "@/components/timepicker";
 import { formSchema } from "@/schemas";
 import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
 import { FormsSkeleton } from "@/components/skeletons/forms-skeleton";
+import { Input } from "@/components/ui/input";
 
 export function PCRFormClient() {
   const [operationType, setOperationType] = useState<
     "EMERGENCY" | "TRANSPORT" | ""
   >("");
   // const router = useRouter();
+  const [customIncident, setCustomIncident] = useState<string>("");
+  const [customVehicleUsed, setCustomVehicleUsed] = useState<string>("");
+  const [customPlaceOfIncident, setCustomPlaceOfIncident] =
+    useState<string>("");
+  const [customReceivingFacility, setCustomReceivingFacility] =
+    useState<string>("");
+  const [customTypeOfConduction, setCustomTypeOfConduction] =
+    useState<string>("");
   const { driverOptions, crewOptions, isLoading, isError } = useOptions();
 
-  const filteredIncidentTypes = incidentTypeList.filter(({ type }) =>
-    operationType ? type === operationType : undefined
-  );
+  const filteredIncidentTypes = useMemo(() => {
+    return operationType
+      ? incidentTypeList.filter(({ type }) => type === operationType)
+      : [];
+  }, [operationType]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,12 +93,11 @@ export function PCRFormClient() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values.typeOfIncident);
     try {
       const formData = new FormData();
-
       formData.append("operationType", values.operationType);
       formData.append("date", values.date.toISOString());
-
       if (values.timeCalled)
         formData.append("timeCalled", values.timeCalled.toISOString());
       if (values.timeDispatched)
@@ -100,51 +110,69 @@ export function PCRFormClient() {
         formData.append("timeEndorsed", values.timeEndorsed.toISOString());
       if (values.timeArrivedAt)
         formData.append("timeArrivedAt", values.timeArrivedAt.toISOString());
-
       if (values.typeOfIncident)
-        formData.append("typeOfIncident", values.typeOfIncident);
+        formData.append(
+          "typeOfIncident",
+          values.typeOfIncident === "Others"
+            ? customIncident
+            : values.typeOfIncident
+        );
       if (values.placeOfIncident)
-        formData.append("placeOfIncident", values.placeOfIncident);
+        formData.append(
+          "placeOfIncident",
+          values.placeOfIncident === "Others"
+            ? customPlaceOfIncident
+            : values.placeOfIncident
+        );
       if (values.receivingFacility)
-        formData.append("receivingFacility", values.receivingFacility);
+        formData.append(
+          "receivingFacility",
+          values.receivingFacility === "Others"
+            ? customReceivingFacility
+            : values.receivingFacility
+        );
       if (values.typeOfConduction)
-        formData.append("typeOfConduction", values.typeOfConduction);
+        formData.append(
+          "typeOfConduction",
+          values.typeOfConduction === "Others"
+            ? customTypeOfConduction
+            : values.typeOfConduction
+        );
       if (values.chiefComplaint)
         formData.append("chiefComplaint", values.chiefComplaint);
       if (values.noOfCasualty)
         formData.append("noOfCasualty", values.noOfCasualty);
       if (values.remarks) formData.append("remarks", values.remarks);
       if (values.vehicleUsed)
-        formData.append("vehicleUsed", values.vehicleUsed);
+        formData.append(
+          "vehicleUsed",
+          values.vehicleUsed === "Others"
+            ? customVehicleUsed
+            : values.vehicleUsed
+        );
       if (values.ambulanceDriver)
         formData.append("ambulanceDriver", values.ambulanceDriver);
-
       if (values.vehiclesInvolved) {
         values.vehiclesInvolved.forEach((vehicle) =>
           formData.append("vehiclesInvolved", vehicle)
         );
       }
-
       if (values.ambulanceCrew && values.ambulanceCrew.length > 0) {
         values.ambulanceCrew.forEach((crew) =>
           formData.append("ambulanceCrew", crew)
         );
       }
-
       if (values.documentation) {
         values.documentation.forEach((file: File) =>
           formData.append("documentation", file)
         );
       }
-
       await createPCRCaseRecord(formData);
-
       console.log(values);
       toast.success("Success!", {
         description: "A new PCR Case was recorded.",
         position: "top-right",
       });
-
       // router.push("/admin/pcr-cases");
       form.reset();
     } catch (error) {
@@ -373,6 +401,15 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+
+                {form.watch("typeOfIncident") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customIncident}
+                    onChange={(e) => setCustomIncident(e.target.value)}
+                  />
+                )}
               </div>
 
               <div className="col-span-4">
@@ -405,6 +442,14 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+                {form.watch("placeOfIncident") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customPlaceOfIncident}
+                    onChange={(e) => setCustomPlaceOfIncident(e.target.value)}
+                  />
+                )}
               </div>
               <div className="col-span-4">
                 <FormField
@@ -436,6 +481,15 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+
+                {form.watch("receivingFacility") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customReceivingFacility}
+                    onChange={(e) => setCustomReceivingFacility(e.target.value)}
+                  />
+                )}
               </div>
               <div className="col-span-4">
                 <FormField
@@ -465,6 +519,14 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+                {form.watch("typeOfConduction") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customTypeOfConduction}
+                    onChange={(e) => setCustomTypeOfConduction(e.target.value)}
+                  />
+                )}
               </div>
             </div>
 
@@ -567,6 +629,14 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+                {form.watch("vehicleUsed") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customVehicleUsed}
+                    onChange={(e) => setCustomVehicleUsed(e.target.value)}
+                  />
+                )}
               </div>
 
               <div className="col-span-4">

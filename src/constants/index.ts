@@ -20,6 +20,7 @@ export const vehicleUsedList: string[] = [
     "RV3",
     "RV4",
     "RV5",
+    "Others",
 ]
 
 
@@ -32,6 +33,7 @@ export const incidentTypeList = [
     { name: "Pediatric", type: "EMERGENCY" },
     { name: "Psychiatric", type: "EMERGENCY" },
     { name: "Trauma", type: "EMERGENCY" },
+    { name: "Others", type: "EMERGENCY" },
 
     { name: "Out Patient (Laboratory)", type: "TRANSPORT" },
     { name: "Out Patient (Dialysis)", type: "TRANSPORT" },
@@ -44,6 +46,8 @@ export const incidentTypeList = [
     { name: "Request for Transport (OB-Gyne)", type: "TRANSPORT" },
     { name: "Request for Transport (Psychiatric)", type: "TRANSPORT" },
     { name: "Request for Transport (Pediatric)", type: "TRANSPORT" },
+    { name: "Others", type: "TRANSPORT" },
+
 ];
 
 
@@ -128,7 +132,8 @@ export const placeOfIncidentAndReceivingFacilities = [
     "Uyawan",
     "VMV Renal Care Center",
     "Visoria East",
-    "Visoria West"
+    "Visoria West",
+    "Others",
 ];
 
 
@@ -152,5 +157,7 @@ export const typeOfConduction = [
     "Pedestrian/ Road Accident to Hospital",
     "School to Hospital",
     "Refusal to Transport",
-    "Others (RT Transport)"
+    "Others (RT Transport)",
+    "Others",
+
 ];

@@ -49,6 +49,7 @@ import { Check, CloudUpload, Loader, Paperclip } from "lucide-react";
 import momentPH from "@/lib/moment";
 import { parseTimeStringToDate } from "@/lib/utils";
 import { updatePCRCaseRecord } from "@/actions";
+import { Input } from "../ui/input";
 
 // const editFormSchema = z.object({
 //   name: z.string().min(1, "Name is required"),
@@ -75,10 +76,19 @@ export default function EditPCRModal({
     "EMERGENCY" | "TRANSPORT" | ""
   >("");
   const { driverOptions, crewOptions, isError } = useOptions();
+  const [customIncident, setCustomIncident] = useState<string>("");
+  const [customVehicleUsed, setCustomVehicleUsed] = useState<string>("");
+  const [customPlaceOfIncident, setCustomPlaceOfIncident] =
+    useState<string>("");
+  const [customReceivingFacility, setCustomReceivingFacility] =
+    useState<string>("");
+  const [customTypeOfConduction, setCustomTypeOfConduction] =
+    useState<string>("");
 
   const filteredIncidentTypes = incidentTypeList.filter(({ type }) =>
     operationType ? type === operationType : undefined
   );
+  const incidentNames = incidentTypeList.map((i) => i.name);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,10 +117,18 @@ export default function EditPCRModal({
   });
 
   useEffect(() => {
-    console.log("RENDERED ");
+    // console.log("RENDERED ");
     if (selectedPCR) {
-      console.log("SELECTED PCR");
+      // console.log("SELECTED PCR");
       setOperationType(selectedPCR.operationType);
+
+      setCustomIncident(selectedPCR.typeOfIncident || "");
+      setCustomPlaceOfIncident(selectedPCR.placeOfIncident || "");
+      setCustomReceivingFacility(selectedPCR.receivingFacility || "");
+      setCustomTypeOfConduction(selectedPCR.typeOfConduction || "");
+      setCustomVehicleUsed(selectedPCR.vehicleUsed || "");
+
+      // FIX THE EDIT FIELD FOR OTHERS BECAUSE IT SHOWS EVEN CUSTOM VALYES IS EMPTY AND SELECTED HAS EMPTY VALUES
 
       const selectedCrewNames =
         selectedPCR.ambulanceCrews?.split(",").map((name) => name.trim()) || [];
@@ -146,15 +164,31 @@ export default function EditPCRModal({
           parseTimeStringToDate(selectedPCR.timeEndorsed) || undefined,
         timeArrivedAt:
           parseTimeStringToDate(selectedPCR.timeArrivedAt) || undefined,
-        typeOfIncident: selectedPCR.typeOfIncident || "",
-        placeOfIncident: selectedPCR.placeOfIncident || "",
-        receivingFacility: selectedPCR.receivingFacility || "",
-        typeOfConduction: selectedPCR.typeOfConduction || "",
+        typeOfIncident: !incidentNames.includes(selectedPCR.typeOfIncident)
+          ? "Others"
+          : selectedPCR.typeOfIncident,
+        placeOfIncident: !placeOfIncidentAndReceivingFacilities.includes(
+          selectedPCR.placeOfIncident
+        )
+          ? "Others"
+          : selectedPCR.placeOfIncident,
+        receivingFacility: !placeOfIncidentAndReceivingFacilities.includes(
+          selectedPCR.receivingFacility
+        )
+          ? "Others"
+          : selectedPCR.receivingFacility,
+        typeOfConduction: !typeOfConduction.includes(
+          selectedPCR.typeOfConduction
+        )
+          ? "Others"
+          : selectedPCR.typeOfConduction,
         vehiclesInvolved: selectedVehiclesInvolved,
         chiefComplaint: selectedPCR.chiefComplaint,
         noOfCasualty: selectedPCR.noOfCasualty,
         remarks: selectedPCR.remarks,
-        vehicleUsed: selectedPCR.vehicleUsed,
+        vehicleUsed: !vehicleUsedList.includes(selectedPCR.vehicleUsed)
+          ? "Others"
+          : selectedPCR.vehicleUsed,
         ambulanceDriver: selectedDriverId,
         ambulanceCrew: selectedCrewIds,
         documentation: [],
@@ -184,20 +218,45 @@ export default function EditPCRModal({
         formData.append("timeArrivedAt", values.timeArrivedAt.toISOString());
 
       if (values.typeOfIncident)
-        formData.append("typeOfIncident", values.typeOfIncident);
+        formData.append(
+          "typeOfIncident",
+          values.typeOfIncident === "Others"
+            ? customIncident
+            : values.typeOfIncident
+        );
       if (values.placeOfIncident)
-        formData.append("placeOfIncident", values.placeOfIncident);
+        formData.append(
+          "placeOfIncident",
+          values.placeOfIncident === "Others"
+            ? customPlaceOfIncident
+            : values.placeOfIncident
+        );
       if (values.receivingFacility)
-        formData.append("receivingFacility", values.receivingFacility);
+        formData.append(
+          "receivingFacility",
+          values.receivingFacility === "Others"
+            ? customReceivingFacility
+            : values.receivingFacility
+        );
       if (values.typeOfConduction)
-        formData.append("typeOfConduction", values.typeOfConduction);
+        formData.append(
+          "typeOfConduction",
+          values.typeOfConduction === "Others"
+            ? customTypeOfConduction
+            : values.typeOfConduction
+        );
       if (values.chiefComplaint)
         formData.append("chiefComplaint", values.chiefComplaint);
       if (values.noOfCasualty)
         formData.append("noOfCasualty", values.noOfCasualty);
       if (values.remarks) formData.append("remarks", values.remarks);
       if (values.vehicleUsed)
-        formData.append("vehicleUsed", values.vehicleUsed);
+        formData.append(
+          "vehicleUsed",
+          values.vehicleUsed === "Others"
+            ? customVehicleUsed
+            : values.vehicleUsed
+        );
       if (values.ambulanceDriver)
         formData.append("ambulanceDriver", values.ambulanceDriver);
 
@@ -451,6 +510,15 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
+
+                {form.watch("typeOfIncident") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other (leave blank if not applicable)"
+                    value={customIncident}
+                    onChange={(e) => setCustomIncident(e.target.value)}
+                  />
+                )}
               </div>
 
               <div className="col-span-4">
@@ -483,6 +551,14 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
+                {form.watch("placeOfIncident") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other (leave blank if not applicable)"
+                    value={customPlaceOfIncident}
+                    onChange={(e) => setCustomPlaceOfIncident(e.target.value)}
+                  />
+                )}
               </div>
               <div className="col-span-4">
                 <FormField
@@ -514,6 +590,15 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
+
+                {form.watch("receivingFacility") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other (leave blank if not applicable)"
+                    value={customReceivingFacility}
+                    onChange={(e) => setCustomReceivingFacility(e.target.value)}
+                  />
+                )}
               </div>
               <div className="col-span-4">
                 <FormField
@@ -543,6 +628,14 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
+                {form.watch("typeOfConduction") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other (leave blank if not applicable)"
+                    value={customTypeOfConduction}
+                    onChange={(e) => setCustomTypeOfConduction(e.target.value)}
+                  />
+                )}
               </div>
             </div>
 
@@ -645,6 +738,14 @@ export default function EditPCRModal({
                     </FormItem>
                   )}
                 />
+                {form.watch("vehicleUsed") === "Others" && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other (leave blank if not applicable)"
+                    value={customVehicleUsed}
+                    onChange={(e) => setCustomVehicleUsed(e.target.value)}
+                  />
+                )}
               </div>
 
               <div className="col-span-4">
