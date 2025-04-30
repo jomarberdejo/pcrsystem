@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formSchema } from "@/schemas";
 import { useOptions } from "@/hooks/use-options";
 import {
@@ -85,9 +85,12 @@ export default function EditPCRModal({
   const [customTypeOfConduction, setCustomTypeOfConduction] =
     useState<string>("");
 
-  const filteredIncidentTypes = incidentTypeList.filter(({ type }) =>
-    operationType ? type === operationType : undefined
-  );
+  const filteredIncidentTypes = useMemo(() => {
+    return operationType
+      ? incidentTypeList.filter(({ type }) => type === operationType)
+      : [];
+  }, [operationType]);
+
   const incidentNames = incidentTypeList.map((i) => i.name);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -117,7 +120,7 @@ export default function EditPCRModal({
   });
 
   useEffect(() => {
-    // console.log("RENDERED ");
+    console.log("RENDERED ");
     if (selectedPCR) {
       // console.log("SELECTED PCR");
       setOperationType(selectedPCR.operationType);
@@ -302,7 +305,10 @@ export default function EditPCRModal({
   if (isError) return <p>Error loading options.</p>;
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-screen overflow-y-scroll max-h-screen">
+      <DialogContent
+        className="min-w-screen overflow-y-scroll max-h-screen"
+        aria-describedby="dialog-content"
+      >
         <DialogHeader>
           <DialogTitle>Edit PCR</DialogTitle>
         </DialogHeader>
