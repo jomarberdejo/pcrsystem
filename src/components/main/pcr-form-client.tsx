@@ -542,7 +542,7 @@ export function PCRFormClient() {
                       <FormControl>
                         <MultiSelect
                           options={vehiclesInvolvedList}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Select vehicles involved"
                         />
@@ -686,7 +686,7 @@ export function PCRFormClient() {
                               value: crew.id,
                             })
                           )}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Select Ambulance Crew(s)"
                         />

@@ -657,7 +657,7 @@ export default function EditPCRModal({
                       <FormControl>
                         <MultiSelect
                           options={vehiclesInvolvedList}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Select vehicles involved"
                         />
@@ -801,7 +801,7 @@ export default function EditPCRModal({
                               value: crew.id,
                             })
                           )}
-                          defaultValue={field.value}
+                          value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Select Ambulance Crew(s)"
                         />
