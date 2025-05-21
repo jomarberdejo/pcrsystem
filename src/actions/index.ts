@@ -53,7 +53,7 @@ export async function createPCRCaseRecord(formData: FormData) {
 
     const vehiclesInvolvedArray = formData.getAll("vehiclesInvolved") as string[];
     const vehiclesInvolved = vehiclesInvolvedArray.length
-        ? vehiclesInvolvedArray.join(", ")
+        ? vehiclesInvolvedArray.join(" vs ")
         : "None";
 
     const ambulanceCrewsId = formData.getAll("ambulanceCrew") as string[];
@@ -164,7 +164,7 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
     if (formData.has("vehiclesInvolved")) {
         const vehiclesInvolved = formData.getAll("vehiclesInvolved") as string[];
         updateData.vehiclesInvolved = vehiclesInvolved.length
-            ? vehiclesInvolved.join(", ")
+            ? vehiclesInvolved.join(" vs ")
             : "None";
     }
 

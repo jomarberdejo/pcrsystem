@@ -1,11 +1,11 @@
 import moment from "moment-timezone";
 import { DateRange } from "react-day-picker";
 
-export function filterDataByDateRange<T extends object>(
-    data: T[],
-    dateRange?: DateRange,
+export function filterDataByDateRange<TData>(
+    data: TData[],
+    dateRange?: DateRange | undefined,
     options?: { mode?: "flat" | "nested" }
-): T[] {
+): TData[] {
     if (!dateRange?.from || !dateRange?.to) return data;
 
     const start = moment(dateRange.from);

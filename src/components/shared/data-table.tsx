@@ -49,10 +49,7 @@ interface DataTableProps<TData, TValue> {
   onRegister?: (type: "CREW" | "DRIVER", name: string, team: string) => void;
 }
 
-export function DataTable<
-  TData extends { records?: { date?: string }[] } = {},
-  TValue = unknown
->({
+export function DataTable<TData, TValue>({
   columns,
   data,
   filterableColumns = [],
@@ -70,8 +67,8 @@ export function DataTable<
   });
 
   const filteredData = useMemo(() => {
-    const mode =
-      data && data.length > 0 && "records" in data[0] ? "nested" : "flat";
+    console.log(data);
+    const mode = exportTitle === "PCR_CASES" ? "flat" : "nested";
 
     const filtered = filterDataByDateRange(data, dateRange, {
       mode,
