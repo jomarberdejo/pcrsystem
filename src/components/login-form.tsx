@@ -8,12 +8,12 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { loginUser } from "@/actions/userService";
 import { toast } from "sonner";
 import { Eye, EyeOff, Lock, Loader } from "lucide-react";
 import { GlowEffect } from "@/components/ui/glow-effect";
 import { TextLoop } from "./ui/text-loop";
 import momentPH from "@/lib/moment";
+import { loginUser } from "@/lib/auth";
 
 export const LoginForm = () => {
   const router = useRouter();

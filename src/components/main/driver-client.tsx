@@ -81,6 +81,7 @@ export function DriverClient() {
         onExport={exportToExcelPersonnel}
         exportTitle="AMBULANCE_DRIVERS"
         onRegister={onRegister}
+        hasDateRange={true}
       />
       <EditPersonnel
         open={modalOpen}

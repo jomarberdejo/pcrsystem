@@ -73,6 +73,7 @@ export function CrewClient() {
         onExport={exportToExcelPersonnel}
         exportTitle="AMBULANCE_CREWS"
         onRegister={onRegister}
+        hasDateRange={true}
       />
       <EditPersonnel
         open={modalOpen}

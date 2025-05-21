@@ -1,3 +1,5 @@
+"use server";
+
 import { SignJWT, jwtVerify } from 'jose';
 import prisma from './prisma';
 import { cookies } from 'next/headers';
@@ -41,6 +43,28 @@ export const createSession = async (userId: string) => {
     return session;
 }
 
+export const loginUser = async ({ username, password }: { username: string; password: string }) => {
+    const user = await prisma.admin.findUnique({
+        where: {
+            username: username,
+        }
+    })
+    if (user) {
+        const verifiedPassword = await verifyPassword(password, user.password)
+        if (verifiedPassword) {
+            await createSession(user.id)
+            return true;
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return false
+    }
+
+}
+
 export const getCurrentUser = async () => {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('sessionToken')?.value;
@@ -72,6 +96,7 @@ export const getCurrentUser = async () => {
         return null;
     }
 }
+
 
 export const logout = async () => {
     const cookieStore = await cookies();

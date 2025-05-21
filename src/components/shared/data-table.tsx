@@ -35,10 +35,9 @@ import { formatColumnKey } from "@/utils/column/formatColumnKey";
 import { DatePickerWithRange } from "../date-range-picker";
 import { DateRange } from "react-day-picker";
 import StaffForm from "./staff-form";
-import {
-  Dateable,
-  filterDataByDateRange,
-} from "@/utils/data-table/filterDataByDateRange";
+import { filterDataByDateRange } from "@/utils/data-table/filterDataByDateRange";
+import { PersonnelType } from "@/types";
+import { computePersonnelStats } from "@/utils/data-table/computePersonnelStats";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -50,7 +49,10 @@ interface DataTableProps<TData, TValue> {
   onRegister?: (type: "CREW" | "DRIVER", name: string, team: string) => void;
 }
 
-export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
+export function DataTable<
+  TData extends { records?: { date?: string }[] } = {},
+  TValue = unknown
+>({
   columns,
   data,
   filterableColumns = [],
@@ -67,10 +69,26 @@ export function DataTable<TData extends Dateable | {} = {}, TValue = unknown>({
     to: undefined,
   });
 
-  const filteredData = useMemo(
-    () => filterDataByDateRange(data, dateRange),
-    [data, dateRange]
-  );
+  const filteredData = useMemo(() => {
+    const mode =
+      data && data.length > 0 && "records" in data[0] ? "nested" : "flat";
+
+    const filtered = filterDataByDateRange(data, dateRange, {
+      mode,
+    });
+
+    if (
+      exportTitle === "AMBULANCE_CREWS" ||
+      exportTitle === "AMBULANCE_DRIVERS"
+    ) {
+      return computePersonnelStats(
+        filtered as unknown as PersonnelType[],
+        dateRange
+      ) as unknown as TData[];
+    }
+
+    return filtered;
+  }, [data, dateRange, exportTitle]);
 
   const registerType = exportTitle === "AMBULANCE_CREWS" ? "CREW" : "DRIVER";
 
