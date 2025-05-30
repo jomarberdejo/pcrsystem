@@ -14,7 +14,7 @@ async function main() {
     //create admin
     const admin1 = await prisma.admin.update({
         where: {
-            username: "mdrrmo_admin",
+            username: "",
         },
         data: { password: hashedPassword },
 

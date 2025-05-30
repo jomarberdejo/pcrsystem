@@ -58,6 +58,8 @@ export function PCRFormClient() {
     useState<string>("");
   const [customTypeOfConduction, setCustomTypeOfConduction] =
     useState<string>("");
+  const [customVehiclesInvolved, setCustomVehiclesInvolved] =
+    useState<string>("");
   const { driverOptions, crewOptions, isLoading, isError } = useOptions();
 
   const filteredIncidentTypes = useMemo(() => {
@@ -153,9 +155,12 @@ export function PCRFormClient() {
       if (values.ambulanceDriver)
         formData.append("ambulanceDriver", values.ambulanceDriver);
       if (values.vehiclesInvolved) {
-        values.vehiclesInvolved.forEach((vehicle) =>
-          formData.append("vehiclesInvolved", vehicle)
-        );
+        values.vehiclesInvolved.forEach((vehicle) => {
+          formData.append(
+            "vehiclesInvolved",
+            vehicle.includes("Others") ? customVehiclesInvolved : vehicle
+          );
+        });
       }
       if (values.ambulanceCrew && values.ambulanceCrew.length > 0) {
         values.ambulanceCrew.forEach((crew) =>
@@ -551,6 +556,15 @@ export function PCRFormClient() {
                     </FormItem>
                   )}
                 />
+
+                {form.watch("vehiclesInvolved")?.includes("Others") && (
+                  <Input
+                    className="mt-1"
+                    placeholder="Specify Other"
+                    value={customVehiclesInvolved}
+                    onChange={(e) => setCustomVehiclesInvolved(e.target.value)}
+                  />
+                )}
               </div>
               <div className="col-span-4">
                 <FormField

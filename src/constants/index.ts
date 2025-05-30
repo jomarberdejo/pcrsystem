@@ -12,6 +12,8 @@ export const vehiclesInvolvedList = [
     { label: "Scooter", value: "Scooter" },
     { label: "Sidecar", value: "Sidecar" },
     { label: "Van", value: "Van" },
+    { label: "Tanker Truck", value: "Tanker Truck" },
+    { label: "Others", value: "Others" }
 ];
 
 
@@ -56,7 +58,7 @@ export const placeOfIncidentAndReceivingFacilities = [
     "ACE Medical Center-Tacloban",
     "Bagong Lipunan",
     "Balais Doctor's Infirmary",
-    "Barugo Municipal Hall",
+    "Barugo Municipal Hospital",
     "Balilit",
     "Barayong",
     "Barugohay Central",

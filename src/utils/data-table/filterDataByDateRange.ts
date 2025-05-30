@@ -1,3 +1,4 @@
+import { PCRReportType } from "@/types";
 import moment from "moment-timezone";
 import { DateRange } from "react-day-picker";
 
@@ -22,7 +23,7 @@ export function filterDataByDateRange<TData>(
 
     return data
         .map((item: any) => {
-            const filteredRecords = (item.records || []).filter((record: any) => {
+            const filteredRecords = (item.records || []).filter((record: PCRReportType) => {
                 if (!record.date) return false;
                 const recordDate = moment.tz(record.date, moment.tz.guess());
                 return recordDate.isBetween(start, end, undefined, "[]");
