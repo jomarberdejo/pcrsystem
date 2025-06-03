@@ -27,7 +27,7 @@ type OperationProperties = {
   chiefComplaint?: string;
   noOfCasualty?: string;
   remarks?: string;
-  vehicleUsed?: string;
+  vehicleUsed?: string | null;
   vehiclesInvolved?: string;
   ambulanceDriverId?: string | null;
 };
