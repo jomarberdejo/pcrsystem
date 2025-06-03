@@ -58,7 +58,7 @@ model Record {
   chiefComplaint    String
   noOfCasualty      String
   remarks           String
-  vehicleUsed       String
+  vehicleUsed       String?
   documentation     Json?         @db.JsonB
   operationType     OperationType
   ambulanceDriverId String?       @db.Uuid
