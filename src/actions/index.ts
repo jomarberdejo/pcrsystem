@@ -43,7 +43,7 @@ export async function createPCRCaseRecord(formData: FormData) {
     const chiefComplaint = formData.get("chiefComplaint") as string;
     const noOfCasualty = formData.get("noOfCasualty") as string;
     const remarks = formData.get("remarks") as string;
-    const vehicleUsed = formData.get("vehicleUsed") as string;
+    const vehicleUsed = formData.get("vehicleUsed") as string | null;
 
     const typeOfIncident = formData.get("typeOfIncident") as string | null;
     const placeOfIncident = formData.get("placeOfIncident") as string | null;
@@ -84,7 +84,7 @@ export async function createPCRCaseRecord(formData: FormData) {
             chiefComplaint,
             noOfCasualty,
             remarks,
-            vehicleUsed,
+            vehicleUsed: vehicleUsed || null,
             typeOfIncident: typeOfIncident || null,
             placeOfIncident: placeOfIncident || null,
             receivingFacility: receivingFacility || null,
@@ -144,7 +144,7 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
         updateData.remarks = formData.get("remarks") as string;
     }
     if (formData.has("vehicleUsed")) {
-        updateData.vehicleUsed = formData.get("vehicleUsed") as string;
+        updateData.vehicleUsed = formData.get("vehicleUsed") as string | null;
     }
     if (formData.has("typeOfIncident")) {
         updateData.typeOfIncident = formData.get("typeOfIncident") as string | null;
