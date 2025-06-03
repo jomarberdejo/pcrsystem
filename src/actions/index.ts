@@ -84,7 +84,7 @@ export async function createPCRCaseRecord(formData: FormData) {
             chiefComplaint,
             noOfCasualty,
             remarks,
-            vehicleUsed: vehicleUsed || null,
+            vehicleUsed: vehicleUsed || "",
             typeOfIncident: typeOfIncident || null,
             placeOfIncident: placeOfIncident || null,
             receivingFacility: receivingFacility || null,
