@@ -8,15 +8,13 @@ const prisma = new PrismaClient();
 async function main() {
     console.log("🌱 Seeding database...");
 
-    const hashedPassword = await hashPassword("");
+    const hashedPassword = await hashPassword("!Admin21234");
 
 
     //create admin
-    const admin1 = await prisma.admin.update({
-        where: {
-            username: "",
-        },
-        data: { password: hashedPassword },
+    const admin1 = await prisma.admin.create({
+
+        data: { username: "mdrrmo_admin2", password: hashedPassword },
 
     });
     // 🚑 Create Ambulance Drivers

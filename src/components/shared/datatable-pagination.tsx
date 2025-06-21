@@ -53,7 +53,7 @@ export function DataTablePagination<TData>({
             </div>
             <div>
               {table.getRowModel().rows.length} of{" "}
-              {table.getCoreRowModel().rows.length} rows
+              {table.getFilteredRowModel().rows.length} rows
             </div>
           </div>
         </div>

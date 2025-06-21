@@ -36,7 +36,9 @@ export interface PCRCaseRecordUpdateData
   extends TimeProperties,
   IncidentProperties,
   OperationProperties,
-  Documentation { }
+  Documentation {
+  updatedById?: string;
+}
 
 export type NavItemsType = {
   title: string;
@@ -90,4 +92,14 @@ export type StaffFormPropType = {
   children: React.ReactNode;
   type: "CREW" | "DRIVER";
   onRegister: (type: "CREW" | "DRIVER", name: string, team: string) => void;
+};
+
+
+
+export type AuditLogType = {
+  id: string;
+  action: string;
+  timestamp: string;
+  recordId: string | null;
+  user: string;
 };

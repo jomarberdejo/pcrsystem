@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { OperationType, PersonnelRole, Status, Team } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth";
+import { logAction } from "@/actions";
 
 export interface CrewResponse {
   id: string;
@@ -82,6 +84,13 @@ export async function GET(): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
     const { name, team } = await request.json();
 
     if (!name) {
@@ -102,7 +111,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       totalEmergencyCases: 0,
       totalTransportCases: 0,
     };
-
+    await logAction(
+      `CREATED_PERSONNEL_CREW: ${newCrew.name}${team ? ` (Team ${team})` : ""}`,
+      currentUser.id
+    );
     return NextResponse.json(newCrewData, { status: 201 });
   } catch (error) {
     console.error(error);

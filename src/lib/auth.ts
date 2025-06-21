@@ -4,6 +4,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import prisma from './prisma';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
+import { logAction } from '@/actions';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -53,6 +54,7 @@ export const loginUser = async ({ username, password }: { username: string; pass
         const verifiedPassword = await verifyPassword(password, user.password)
         if (verifiedPassword) {
             await createSession(user.id)
+            await logAction('LOGGED_IN', user.id)
             return true;
         }
         else {
@@ -106,9 +108,16 @@ export const logout = async () => {
         return;
     }
 
+    const user = await getCurrentUser();
+    if (user) {
+        await logAction('LOGGED_OUT', user.id);
+    }
+
     await prisma.session.deleteMany({
         where: { sessionToken }
     });
 
     cookieStore.delete('sessionToken');
+
+
 }

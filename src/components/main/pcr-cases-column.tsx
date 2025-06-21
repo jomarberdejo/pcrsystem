@@ -1,6 +1,8 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,8 +24,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreHorizontal, PenIcon } from "lucide-react";
+import { MoreHorizontal, PenIcon, TrashIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import { deletePCRCaseRecord } from "@/actions";
+import { toast } from "sonner";
+import { useState } from "react";
 
 type Props = {
   setSelectedPCR: (pcr: PCRReportType) => void;
@@ -198,7 +203,8 @@ export const columns = ({
   {
     id: "actions",
     cell: ({ row }) => {
-      const personnel = row.original;
+      const pcrCase = row.original;
+      const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
 
       return (
         <DropdownMenu>
@@ -217,13 +223,50 @@ export const columns = ({
               variant="ghost"
               className="w-full"
               onClick={() => {
-                setSelectedPCR(personnel);
+                setSelectedPCR(pcrCase);
                 setModalOpen(true);
               }}
             >
               <PenIcon className="w-[16px] mr-2" />
               Edit
             </Button>
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="w-full">
+                  <TrashIcon className="w-[16px] mr-2" />
+                  Delete
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    this pcr case and all the information related to it.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    className="cursor-pointer"
+                    onClick={async () => {
+                      try {
+                        await deletePCRCaseRecord(row.original.id);
+                        toast.success("Success!", {
+                          description: "A PCR Case was successfully deleted.",
+                          position: "top-right",
+                        });
+                        setDeleteDialogOpen(false);
+                      } catch (error) {
+                        toast.error("Failed to delete. Please try again.");
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { formatDateDisplay } from "@/lib/utils";
 import momentPH from "@/lib/moment";
 function computeTimeDiff(startTime?: string | null, endTime?: string | null): string {
-  if (!startTime || !endTime) return ""; // Return empty if either time is missing
+  if (!startTime || !endTime) return "";
 
   const format = "h:mm A";
   const start = momentPH(startTime, format);

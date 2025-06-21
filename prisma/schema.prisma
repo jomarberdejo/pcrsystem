@@ -64,6 +64,14 @@ model Record {
   ambulanceDriverId String?       @db.Uuid
   ambulanceDriver   Personnel?    @relation("DriverRecords", fields: [ambulanceDriverId], references: [id], onDelete: SetNull)
   ambulanceCrews    RecordCrew[]
+  createdById       String?       @db.Uuid
+  createdBy         Admin?        @relation("CreatedRecords", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById       String?       @db.Uuid
+  updatedBy         Admin?        @relation("UpdatedRecords", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime?     @updatedAt
+
+  auditLogs AuditLog[] @relation("AuditLogRecord")
 }
 
 model RecordCrew {
@@ -77,11 +85,24 @@ model RecordCrew {
 }
 
 model Admin {
-  id          String    @id @default(uuid()) @db.Uuid
-  username    String    @unique
-  password    String
-  dateCreated DateTime  @default(now())
-  sessions    Session[]
+  id             String     @id @default(uuid()) @db.Uuid
+  username       String     @unique
+  password       String
+  dateCreated    DateTime   @default(now())
+  sessions       Session[]
+  createdRecords Record[]   @relation("CreatedRecords")
+  updatedRecords Record[]   @relation("UpdatedRecords")
+  auditLogs      AuditLog[] @relation("PerformedByAdmin")
+}
+
+model AuditLog {
+  id               String   @id @default(uuid()) @db.Uuid
+  action           String
+  performedBy      String   @db.Uuid
+  performedByAdmin Admin    @relation("PerformedByAdmin", fields: [performedBy], references: [id])
+  timestamp        DateTime @default(now())
+  recordId         String?  @db.Uuid
+  record           Record?  @relation("AuditLogRecord", fields: [recordId], references: [id], onDelete: SetNull)
 }
 
 model Session {
@@ -92,16 +113,3 @@ model Session {
   expires      DateTime
   createdAt    DateTime @default(now())
 }
-
-// enum CustomOptionType {
-//   EMERGENCY
-//   TRANSPORT
-// }
-
-// model CustomOption {
-//   id        Int              @id @default(autoincrement())
-//   category  String
-//   value     String
-//   type      CustomOptionType
-//   createdAt DateTime         @default(now())
-// }

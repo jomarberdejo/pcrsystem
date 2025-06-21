@@ -38,6 +38,8 @@ import StaffForm from "./staff-form";
 import { filterDataByDateRange } from "@/utils/data-table/filterDataByDateRange";
 import { PersonnelType } from "@/types";
 import { computePersonnelStats } from "@/utils/data-table/computePersonnelStats";
+import { logAction } from "@/actions";
+import { getCurrentUser } from "@/lib/auth";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,6 +67,7 @@ export function DataTable<TData, TValue>({
     from: undefined,
     to: undefined,
   });
+  const [suggestions, setSuggestions] = useState<Record<string, string[]>>({});
 
   const filteredData = useMemo(() => {
     console.log(data);
@@ -112,19 +115,83 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const handleInputChange = (col: string, value: string) => {
+    if (col === "ambulanceCrews") {
+      table.getColumn(col)?.setFilterValue(value);
+
+      if (value.trim() === "") {
+        // If input is empty, clear suggestions
+        setSuggestions((prev) => ({ ...prev, [col]: [] }));
+        return;
+      }
+
+      // Gather all crew members split by comma and trimmed
+      const allCrewMembers = filteredData.flatMap((item) => {
+        const crewsStr = (item as any)[col];
+        if (!crewsStr) return [];
+        return crewsStr.split(",").map((crew: string) => crew.trim());
+      });
+
+      const uniqueCrewMembers = Array.from(new Set(allCrewMembers));
+
+      const filteredCrewSuggestions = uniqueCrewMembers
+        .filter((name) => name.toLowerCase().includes(value.toLowerCase()))
+        .slice(0, 5);
+
+      setSuggestions((prev) => ({
+        ...prev,
+        [col]: filteredCrewSuggestions,
+      }));
+    } else {
+      const column = table.getColumn(col);
+      column?.setFilterValue(value);
+
+      if (value.trim() === "") {
+        setSuggestions((prev) => ({ ...prev, [col]: [] }));
+        return;
+      }
+
+      const uniqueValues = Array.from(
+        new Set(filteredData.map((item) => (item as any)[col]))
+      )
+        .filter((v) => v?.toLowerCase?.().includes(value.toLowerCase()))
+        .slice(0, 5);
+
+      setSuggestions((prev) => ({
+        ...prev,
+        [col]: uniqueValues,
+      }));
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center flex-wrap lg:flex-nowrap gap-4 py-4">
         {filterableColumns.map((col) => (
-          <Input
-            key={col}
-            placeholder={`Search ${formatColumnKey(col)}...`}
-            value={(table.getColumn(col)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(col)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm w-full border-border outline-ring/50"
-          />
+          <div className="relative" key={col}>
+            <Input
+              placeholder={`Search ${formatColumnKey(col)}...`}
+              value={(table.getColumn(col)?.getFilterValue() as string) ?? ""}
+              onChange={(event) => handleInputChange(col, event.target.value)}
+              className="max-w-sm w-full border-border outline-ring/50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-400"
+            />
+            {suggestions[col]?.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg dark:border-gray-700">
+                {suggestions[col].map((suggestion) => (
+                  <div
+                    key={suggestion}
+                    onClick={() => {
+                      table.getColumn(col)?.setFilterValue(suggestion);
+                      setSuggestions((prev) => ({ ...prev, [col]: [] }));
+                    }}
+                    className="cursor-pointer px-4 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700"
+                  >
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
         {hasDateRange && (
           <DatePickerWithRange
@@ -137,7 +204,18 @@ export function DataTable<TData, TValue>({
           <div className="flex justify-end items-center">
             <Button
               variant="default"
-              onClick={() => onExport(filteredData, exportTitle)}
+              onClick={async () => {
+                onExport(filteredData, exportTitle);
+                const currentUser = await getCurrentUser();
+
+                if (!currentUser) {
+                  throw new Error("Not authenticated");
+                }
+
+                const adminId = currentUser.id;
+
+                await logAction(`EXPORTED_DATA for (${exportTitle})`, adminId);
+              }}
               disabled={filteredData.length === 0}
             >
               <Download />

@@ -4,8 +4,10 @@ import { v2 as cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { OperationType } from "@prisma/client";
-import { formatTimeInManila } from "@/lib/utils";
+import { formatDateDisplay, formatTimeInManila } from "@/lib/utils";
 import { PCRCaseRecordUpdateData } from "@/types";
+import { getCurrentUser } from "@/lib/auth"
+
 
 cloudinary.config({
     cloudinary_url: process.env.CLOUDINARY_URL!,
@@ -37,6 +39,14 @@ const deleteFromCloudinary = (public_id: string): Promise<void> => {
 }
 
 export async function createPCRCaseRecord(formData: FormData) {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        throw new Error('Not authenticated');
+    }
+
+    const adminId = currentUser.id;
+
     const operationType = formData.get("operationType") as OperationType;
     const date = new Date(formData.get("date") as string);
 
@@ -77,7 +87,7 @@ export async function createPCRCaseRecord(formData: FormData) {
             : [];
 
 
-    await prisma.record.create({
+    const record = await prisma.record.create({
         data: {
             operationType,
             date,
@@ -105,8 +115,17 @@ export async function createPCRCaseRecord(formData: FormData) {
                     })),
                 },
             }),
+            createdById: adminId,
         },
     });
+
+    await logAction(
+        `CREATED_PCR_RECORD: [${record.operationType}] Date: ${formatDateDisplay(record.date)} | ` +
+        `Time Called: ${record.timeCalled || "N/A"} | ` +
+        `Time of ERT Dispatched: ${record.timeDispatched || "N/A"} | `,
+        adminId,
+        record.id
+    );
 
     revalidatePath("/records");
 
@@ -115,18 +134,38 @@ export async function createPCRCaseRecord(formData: FormData) {
 
 
 
+export async function logAction(action: string, performedBy: string, recordId?: string) {
+    return prisma.auditLog.create({
+        data: {
+            action,
+            performedBy,
+            recordId
+        }
+    });
+}
+
 
 export async function updatePCRCaseRecord(id: string, formData: FormData) {
     // console.log("FORM VALUES UPDATE:");
     // formData.forEach((value, key) => {
     //     console.log(`${key}: ${value}`);
     // });
+
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        throw new Error('Not authenticated');
+    }
+
+    const adminId = currentUser.id;
+
     const getTime = (field: string): string | null => {
         const value = formData.get(field);
         return value ? formatTimeInManila(value as string) : null;
     };
 
-    const updateData: PCRCaseRecordUpdateData = {};
+    const updateData: PCRCaseRecordUpdateData = {
+    };
 
     if (formData.has("operationType")) {
         updateData.operationType = formData.get("operationType") as OperationType;
@@ -192,13 +231,21 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
 
     }
 
+    updateData.updatedById = adminId;
+
     //SET TO NULL WHEN NO AMBULANCE CREW IN UPDATE
 
     if (Object.keys(updateData).length > 0) {
-        await prisma.record.update({
+        const record = await prisma.record.update({
             where: { id },
             data: updateData,
         });
+
+        await logAction(`UPDATED_PCR_RECORD: [${record.operationType}] Date: ${formatDateDisplay(record.date)} | ` +
+            `Time Called: ${record.timeCalled || "N/A"} | ` +
+            `Time of ERT Dispatched: ${record.timeDispatched || "N/A"} | `, adminId, id);
+
+
     }
 
     if (formData.has("ambulanceCrew")) {
@@ -225,4 +272,39 @@ export async function updatePCRCaseRecord(id: string, formData: FormData) {
 }
 
 
+export async function deletePCRCaseRecord(id: string) {
+    const currentUser = await getCurrentUser();
 
+    if (!currentUser) {
+        throw new Error("Not authenticated");
+    }
+
+    const record = await prisma.record.findUnique({
+        where: { id },
+        select: { date: true, documentation: true },
+    });
+
+    if (record?.documentation && Array.isArray(record.documentation)) {
+        const docs = record.documentation as Array<{ url: string; publicId: string }>;
+
+        await Promise.all(
+            docs.map(async (doc) => {
+                if (doc.publicId) {
+                    await deleteFromCloudinary(doc.publicId);
+                }
+            })
+        );
+    }
+
+
+
+    const deletedRecord = await prisma.record.delete({
+        where: { id },
+    });
+
+    await logAction(`DELETED_PCR_RECORD: [${deletedRecord.operationType}] Date: ${formatDateDisplay(deletedRecord.date)} | ` +
+        `Time Called: ${deletedRecord.timeCalled || "N/A"} | ` +
+        `Time of ERT Dispatched: ${deletedRecord.timeDispatched || "N/A"} | `, currentUser.id);
+
+
+}

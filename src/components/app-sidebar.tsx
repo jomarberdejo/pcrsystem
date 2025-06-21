@@ -8,6 +8,7 @@ import {
   Users,
   Ambulance,
   ArrowLeft,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -85,7 +86,7 @@ export const AppSidebar = () => {
       }
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Failed to logout. Please try again."); // Optional error notification
+      toast.error("Failed to logout. Please try again.");
     }
   };
 
@@ -96,6 +97,7 @@ export const AppSidebar = () => {
           <span className="text-lg pl-1 font-bold">PCR System</span>
         </SidebarHeader>
 
+        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs">
             Navigation Menu
@@ -115,8 +117,29 @@ export const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* NEW Audit Logs Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs">System Logs</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/admin/audit-logs"}
+                >
+                  <Link href="/admin/audit-logs">
+                    <History size={60} />
+                    <span className="text-md">Audit Logs</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
+      {/* Footer */}
       <SidebarFooter>
         <Popover>
           <div className="p-2 cursor-pointer flex justify-between items-center">

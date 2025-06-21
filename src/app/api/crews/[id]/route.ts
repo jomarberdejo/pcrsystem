@@ -1,11 +1,20 @@
 import { PersonnelRole, Status, Team } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/lib/prisma'
+import { getCurrentUser } from "@/lib/auth";
+import { logAction } from "@/actions";
 
 export async function PUT(request: NextRequest, { params }: {
     params: Promise<{ id: string }>
 }): Promise<NextResponse> {
     try {
+
+        const currentUser = await getCurrentUser();
+
+        if (!currentUser) {
+            return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        }
+
         const id = (await params).id;
         const { name, team, role, status, archivedAt }: { name?: string, team?: Team, role?: PersonnelRole, status: Status, archivedAt?: string } = await request.json();
 
@@ -21,7 +30,7 @@ export async function PUT(request: NextRequest, { params }: {
             return NextResponse.json({ error: "Crew not found" }, { status: 404 });
         }
 
-        await prisma.personnel.update({
+        const personnel = await prisma.personnel.update({
             where: { id },
             data: {
                 name,
@@ -31,7 +40,10 @@ export async function PUT(request: NextRequest, { params }: {
                 archivedAt,
             },
         });
-
+        await logAction(
+            `UPDATED_PERSONNEL: ${personnel.name} → ${name || personnel.name}${team ? ` (Team ${team})` : ""}${role ? ` as ${role}` : ""}`,
+            currentUser.id
+        );
         return NextResponse.json({ message: "Update successful" }, { status: 200 });
 
     } catch (error) {
