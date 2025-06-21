@@ -118,7 +118,6 @@ export const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* NEW Audit Logs Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs">System Logs</SidebarGroupLabel>
           <SidebarGroupContent>
