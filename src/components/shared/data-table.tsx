@@ -40,6 +40,7 @@ import { PersonnelType } from "@/types";
 import { computePersonnelStats } from "@/utils/data-table/computePersonnelStats";
 import { logAction } from "@/actions";
 import { getCurrentUser } from "@/lib/auth";
+import { startOfMonth, endOfMonth } from "date-fns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -49,6 +50,7 @@ interface DataTableProps<TData, TValue> {
   exportTitle: string;
   hasDateRange?: boolean;
   onRegister?: (type: "CREW" | "DRIVER", name: string, team: string) => void;
+  currentUserRole?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -59,6 +61,7 @@ export function DataTable<TData, TValue>({
   exportTitle,
   hasDateRange,
   onRegister,
+  currentUserRole,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -120,12 +123,10 @@ export function DataTable<TData, TValue>({
       table.getColumn(col)?.setFilterValue(value);
 
       if (value.trim() === "") {
-        // If input is empty, clear suggestions
         setSuggestions((prev) => ({ ...prev, [col]: [] }));
         return;
       }
 
-      // Gather all crew members split by comma and trimmed
       const allCrewMembers = filteredData.flatMap((item) => {
         const crewsStr = (item as any)[col];
         if (!crewsStr) return [];
@@ -193,14 +194,18 @@ export function DataTable<TData, TValue>({
             )}
           </div>
         ))}
-        {hasDateRange && (
-          <DatePickerWithRange
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-          />
-        )}
 
-        {onExport && hasDateRange && (
+        {(exportTitle === "PCR_CASES" ||
+          (currentUserRole === "MDRRMO_ADMIN" &&
+            exportTitle !== "PCR_CASES")) &&
+          hasDateRange && (
+            <DatePickerWithRange
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+            />
+          )}
+
+        {currentUserRole === "MDRRMO_ADMIN" && onExport && hasDateRange && (
           <div className="flex justify-end items-center">
             <Button
               variant="default"
@@ -224,7 +229,7 @@ export function DataTable<TData, TValue>({
           </div>
         )}
 
-        {onExport && !hasDateRange && (
+        {/* {onExport && !hasDateRange && (
           <div className="flex justify-end items-center">
             <Button
               variant="default"
@@ -232,10 +237,10 @@ export function DataTable<TData, TValue>({
               disabled={data.length === 0}
             >
               <Download />
-              <span>Export to Excel</span>
+              <span>Export to Excelss</span>
             </Button>
           </div>
-        )}
+        )} */}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -1,14 +1,15 @@
 "use client";
 
-import { PersonnelType } from "@/types";
-import { DataTable } from "@/components/shared/data-table";
-import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
-import { staffColumns } from "@/components/shared/staff-columns";
+import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { useState } from "react";
+import { PersonnelType } from "@/types";
+import { DataTable } from "@/components/shared/data-table";
+import { staffColumns } from "@/components/shared/staff-columns";
+import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel";
 import EditPersonnel from "@/components/shared/edit-personnel-modal";
 import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
+import { useUser } from "@/context/UserProvider";
 
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
@@ -28,12 +29,18 @@ export function CrewClient() {
     refreshInterval: 60000,
   });
 
+  const { user, isLoading: userLoading, error: userError } = useUser();
   const [selectedPersonnel, setSelectedPersonnel] =
     useState<PersonnelType | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   if (error) return <p className="text-red-500">Failed to fetch data</p>;
-  if (isLoading || !ambulanceCrewData) return <DataTableSkeleton />;
+  if (userError)
+    return <p className="text-red-500">Failed to fetch user info</p>;
+  if (isLoading || !ambulanceCrewData || userLoading)
+    return <DataTableSkeleton />;
+
+  console.log("CLIENT RENDERED");
 
   const onRegister = async (
     type: "CREW" | "DRIVER",
@@ -67,13 +74,18 @@ export function CrewClient() {
   return (
     <>
       <DataTable
-        columns={staffColumns({ setSelectedPersonnel, setModalOpen })}
+        columns={staffColumns({
+          setSelectedPersonnel,
+          setModalOpen,
+          currentUserRole: user?.role ?? "REGULAR_ADMIN",
+        })}
         filterableColumns={["name", "team"]}
         data={ambulanceCrewData}
         onExport={exportToExcelPersonnel}
         exportTitle="AMBULANCE_CREWS"
         onRegister={onRegister}
         hasDateRange={true}
+        currentUserRole={user?.role}
       />
       <EditPersonnel
         open={modalOpen}

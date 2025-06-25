@@ -7,6 +7,8 @@ export const metadata: Metadata = {
 };
 
 export default function CrewPage() {
+  console.log("SERVER RENDERED");
+
   return (
     <div className="w-full mx-auto overflow-x-hidden py-4">
       <Card className="border-hidden shadow-none">

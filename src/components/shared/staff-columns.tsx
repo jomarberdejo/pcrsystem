@@ -19,123 +19,132 @@ const teamColorMap: Record<string, string> = {
 type Props = {
   setSelectedPersonnel: (personnel: PersonnelType) => void;
   setModalOpen: (value: boolean) => void;
+  currentUserRole: string;
 };
 
 export const staffColumns = ({
   setSelectedPersonnel,
   setModalOpen,
-}: Props): ColumnDef<PersonnelType>[] => [
-  {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Name
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-  },
-  {
-    id: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const statusColor =
-        status === "ACTIVE"
-          ? "bg-gray-200 text-gray-800"
-          : "bg-green-100 text-green-700";
-
-      return (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
+  currentUserRole,
+}: Props): ColumnDef<PersonnelType>[] => {
+  const baseColumns: ColumnDef<PersonnelType>[] = [
+    {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          {status}
-        </span>
-      );
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
     },
-  },
+    {
+      id: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const statusColor =
+          status === "ACTIVE"
+            ? "bg-gray-200 text-gray-800"
+            : "bg-green-100 text-green-700";
 
-  {
-    accessorKey: "team",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        TEAM
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => {
-      const personnel = row.original;
-      const teamColorClass = teamColorMap[personnel.team] || "text-gray-500";
-
-      return (
-        <span className={`font-medium ${teamColorClass}`}>
-          {personnel.team}
-        </span>
-      );
+        return (
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
+          >
+            {status}
+          </span>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Role/Designation
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => {
-      const personnelRole = row.original;
+    {
+      accessorKey: "team",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          TEAM
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const personnel = row.original;
+        const teamColorClass = teamColorMap[personnel.team] || "text-gray-500";
 
-      const formatRole =
-        personnelRole.role === "BOTH" ? "DRIVER/CREW" : personnelRole.role;
-
-      return <span className="font-medium">{formatRole}</span>;
+        return (
+          <span className={`font-medium ${teamColorClass}`}>
+            {personnel.team}
+          </span>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "totalTransportCases",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Total Transport Cases
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-  },
-  {
-    accessorKey: "totalEmergencyCases",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Total Emergency Cases
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-  },
-  {
-    accessorKey: "totalNumberOfOperations",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Total Operations
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-  },
-  {
+    {
+      accessorKey: "role",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Role/Designation
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const personnelRole = row.original;
+
+        const formatRole =
+          personnelRole.role === "BOTH" ? "DRIVER/CREW" : personnelRole.role;
+
+        return <span className="font-medium">{formatRole}</span>;
+      },
+    },
+  ];
+
+  if (currentUserRole === "MDRRMO_ADMIN") {
+    baseColumns.push(
+      {
+        accessorKey: "totalTransportCases",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Total Transport Cases
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+      },
+      {
+        accessorKey: "totalEmergencyCases",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Total Emergency Cases
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+      },
+      {
+        accessorKey: "totalNumberOfOperations",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Total Operations
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+      }
+    );
+  }
+
+  baseColumns.push({
     id: "actions",
     cell: ({ row }) => {
       const personnel = row.original;
@@ -168,5 +177,7 @@ export const staffColumns = ({
         </DropdownMenu>
       );
     },
-  },
-];
+  });
+
+  return baseColumns;
+};

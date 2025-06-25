@@ -84,10 +84,16 @@ model RecordCrew {
   @@unique([recordId, crewId])
 }
 
+enum AdminRole {
+  MDRRMO_ADMIN
+  REGULAR_ADMIN
+}
+
 model Admin {
   id             String     @id @default(uuid()) @db.Uuid
   username       String     @unique
   password       String
+  role           AdminRole  @default(REGULAR_ADMIN)
   dateCreated    DateTime   @default(now())
   sessions       Session[]
   createdRecords Record[]   @relation("CreatedRecords")

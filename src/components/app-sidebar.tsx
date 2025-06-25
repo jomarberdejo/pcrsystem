@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./toggle-mode";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useUser } from "@/context/UserProvider";
 
 const items: NavItemsType[] = [
   {
@@ -65,6 +66,7 @@ const items: NavItemsType[] = [
 export const AppSidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useUser();
 
   const handleLogout = async () => {
     try {
@@ -97,7 +99,6 @@ export const AppSidebar = () => {
           <span className="text-lg pl-1 font-bold">PCR System</span>
         </SidebarHeader>
 
-        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs">
             Navigation Menu
@@ -118,27 +119,30 @@ export const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs">System Logs</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/admin/audit-logs"}
-                >
-                  <Link href="/admin/audit-logs">
-                    <History size={60} />
-                    <span className="text-md">Audit Logs</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {user?.role === "MDRRMO_ADMIN" && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs">
+              System Logs
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/admin/audit-logs"}
+                  >
+                    <Link href="/admin/audit-logs">
+                      <History size={60} />
+                      <span className="text-md">Audit Logs</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
-      {/* Footer */}
       <SidebarFooter>
         <Popover>
           <div className="p-2 cursor-pointer flex justify-between items-center">

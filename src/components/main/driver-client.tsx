@@ -9,16 +9,17 @@ import { exportToExcelPersonnel } from "@/utils/pcr-cases/exportToExcelPersonnel
 import useSWR from "swr";
 import EditPersonnel from "@/components/shared/edit-personnel-modal";
 import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
+import { useUser } from "@/context/UserProvider";
 
 const fetcher = async (url: string): Promise<PersonnelType[]> => {
   const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("Failed to fetch driver personnels data");
-  }
+  if (!res.ok) throw new Error("Failed to fetch driver personnels data");
   return res.json();
 };
 
 export function DriverClient() {
+  const { user, isLoading: userLoading, error: userError } = useUser();
+
   const {
     data: ambulanceDriverData,
     error,
@@ -32,13 +33,10 @@ export function DriverClient() {
     useState<PersonnelType | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  if (error) {
-    return <p className="text-red-500">Failed to fetch data</p>;
-  }
-
-  if (isLoading || !ambulanceDriverData) {
+  if (error) return <p className="text-red-500">Failed to fetch data</p>;
+  if (userError) return <p className="text-red-500">Failed to fetch user</p>;
+  if (isLoading || !ambulanceDriverData || userLoading)
     return <DataTableSkeleton />;
-  }
 
   const onRegister = async (
     type: "CREW" | "DRIVER",
@@ -75,6 +73,7 @@ export function DriverClient() {
         columns={staffColumns({
           setSelectedPersonnel,
           setModalOpen,
+          currentUserRole: user?.role ?? "REGULAR_ADMIN",
         })}
         filterableColumns={["name", "team"]}
         data={ambulanceDriverData}
@@ -82,6 +81,7 @@ export function DriverClient() {
         exportTitle="AMBULANCE_DRIVERS"
         onRegister={onRegister}
         hasDateRange={true}
+        currentUserRole={user?.role}
       />
       <EditPersonnel
         open={modalOpen}
