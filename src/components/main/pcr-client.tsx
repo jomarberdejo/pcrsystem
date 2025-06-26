@@ -8,6 +8,7 @@ import { PCRReportType } from "@/types";
 import { DataTableSkeleton } from "@/components/skeletons/pcr-cases-skeleton";
 import { useState } from "react";
 import EditPCRModal from "../shared/edit-pcr-modal";
+import { useUser } from "@/context/UserProvider";
 
 const fetcher = async (url: string): Promise<PCRReportType[]> => {
   const res = await fetch(url);
@@ -29,6 +30,8 @@ export function PCRCaseClient() {
   const [selectedPCR, setSelectedPCR] = useState<PCRReportType | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const { user } = useUser();
+
   if (error) return <p className="text-red-500">Failed to fetch data</p>;
   if (isLoading || !pcrData) return <DataTableSkeleton />;
   return (
@@ -43,6 +46,7 @@ export function PCRCaseClient() {
         onExport={exportToExcelAdvanced}
         exportTitle="PCR_CASES"
         hasDateRange={true}
+        currentUserRole={user?.role}
       />
 
       <EditPCRModal

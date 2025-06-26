@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest, { params }: {
         }
 
         const id = (await params).id;
-        const { name, team, role, status, archivedAt }: { name?: string, team?: Team, role?: PersonnelRole, status: Status, archivedAt?: string } = await request.json();
+        const { name, team, role, customRole, status, archivedAt }: { name?: string, team?: Team, role?: PersonnelRole, customRole?: string, status: Status, archivedAt?: string } = await request.json();
 
         if (!id) {
             return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -35,6 +35,7 @@ export async function PUT(request: NextRequest, { params }: {
             data: {
                 name,
                 ...(team && { team }),
+                ...(customRole && { customRole }),
                 role,
                 status,
                 archivedAt,

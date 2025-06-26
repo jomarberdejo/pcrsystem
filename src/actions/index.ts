@@ -308,3 +308,38 @@ export async function deletePCRCaseRecord(id: string) {
 
 
 }
+
+
+export async function deletePersonnel(id: string) {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        throw new Error("Not authenticated");
+    }
+
+    const personnel = await prisma.personnel.findUnique({
+        where: { id },
+        select: {
+            name: true,
+            role: true,
+            team: true,
+            status: true,
+        },
+    });
+
+    if (!personnel) {
+        throw new Error("Personnel not found");
+    }
+
+    await prisma.personnel.delete({
+        where: { id },
+    });
+
+    await logAction(
+        `DELETED_PERSONNEL: Name: ${personnel.name} | Role: ${personnel.role} | Team: ${personnel.team} | Status: ${personnel.status}`,
+        currentUser.id
+    );
+
+
+    return { success: true };
+}

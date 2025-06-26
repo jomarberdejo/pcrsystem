@@ -1,6 +1,6 @@
 import { PersonnelType } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, PenIcon } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PenIcon, TrashIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -9,6 +9,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { deletePersonnel } from "@/actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { useState } from "react";
 
 const teamColorMap: Record<string, string> = {
   CHARLIE: "text-blue-500",
@@ -40,25 +52,33 @@ export const staffColumns = ({
         </Button>
       ),
     },
-    {
-      id: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.original.status;
-        const statusColor =
-          status === "ACTIVE"
-            ? "bg-gray-200 text-gray-800"
-            : "bg-green-100 text-green-700";
+    // {
+    //   id: "status",
+    //   header: ({ column }) => (
+    //     <Button
+    //       variant="ghost"
+    //       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //     >
+    //       Status
+    //       <ArrowUpDown className="ml-2 h-4 w-4" />
+    //     </Button>
+    //   ),
+    //   cell: ({ row }) => {
+    //     const status = row.original.status;
+    //     const statusColor =
+    //       status === "ACTIVE"
+    //         ? "bg-gray-200 text-gray-800"
+    //         : "bg-green-100 text-green-700";
 
-        return (
-          <span
-            className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
-          >
-            {status}
-          </span>
-        );
-      },
-    },
+    //     return (
+    //       <span
+    //         className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
+    //       >
+    //         {status}
+    //       </span>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "team",
       header: ({ column }) => (
@@ -99,6 +119,30 @@ export const staffColumns = ({
           personnelRole.role === "BOTH" ? "DRIVER/CREW" : personnelRole.role;
 
         return <span className="font-medium">{formatRole}</span>;
+      },
+    },
+
+    {
+      accessorKey: "customRole",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Additional Role
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const customRole = row.original.customRole;
+
+        return customRole ? (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+            {customRole}
+          </span>
+        ) : (
+          <span className="text-gray-400 italic">None</span>
+        );
       },
     },
   ];
@@ -148,6 +192,7 @@ export const staffColumns = ({
     id: "actions",
     cell: ({ row }) => {
       const personnel = row.original;
+      const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
 
       return (
         <DropdownMenu>
@@ -173,6 +218,44 @@ export const staffColumns = ({
               <PenIcon className="w-[16px] mr-2" />
               Edit
             </Button>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="w-full">
+                  <TrashIcon className="w-[16px] mr-2" />
+                  Delete
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you absolutely sure?</DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    this personnel and the information related to it.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    className="cursor-pointer"
+                    onClick={async () => {
+                      try {
+                        await deletePersonnel(row.original.id);
+                        toast.success("Success!", {
+                          description: "A PCR Case was successfully deleted.",
+                          position: "top-right",
+                        });
+                        setDeleteDialogOpen(false);
+                      } catch (error) {
+                        toast.error("Failed to delete. Please try again.");
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

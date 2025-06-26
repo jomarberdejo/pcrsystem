@@ -72,6 +72,8 @@ export function DataTable<TData, TValue>({
   });
   const [suggestions, setSuggestions] = useState<Record<string, string[]>>({});
 
+  console.log(currentUserRole);
+
   const filteredData = useMemo(() => {
     console.log(data);
     const mode = exportTitle === "PCR_CASES" ? "flat" : "nested";

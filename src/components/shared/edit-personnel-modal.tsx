@@ -33,6 +33,7 @@ const editFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   team: z.string().optional(),
   role: z.string().min(1, "Role/Designation is required"),
+  customRole: z.string().optional(),
   status: z.enum(["ACTIVE", "ARCHIVED"]),
   archivedAt: z.string().optional(),
 });
@@ -58,6 +59,7 @@ export default function EditPersonnel({
       name: "",
       team: "",
       role: "",
+      customRole: "",
       status: "ACTIVE",
       archivedAt: "",
     },
@@ -69,7 +71,8 @@ export default function EditPersonnel({
         name: selectedPersonnel.name,
         team: selectedPersonnel.team || "",
         role: selectedPersonnel.role || "",
-        status: selectedPersonnel.archivedAt ? "ARCHIVED" : "ACTIVE",
+        customRole: selectedPersonnel.customRole || "",
+        status: selectedPersonnel.status,
         archivedAt: selectedPersonnel.archivedAt || "",
       });
     }
@@ -178,7 +181,25 @@ export default function EditPersonnel({
               )}
             />
 
-            {/* Status Field */}
+            <FormField
+              control={form.control}
+              name="customRole"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Role (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="customRole"
+                      {...field}
+                      className="col-span-3"
+                      placeholder="e.g. INTERN, SPS, DOCTOR"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="status"

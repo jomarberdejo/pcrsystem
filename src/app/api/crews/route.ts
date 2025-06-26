@@ -10,6 +10,7 @@ export interface CrewResponse {
   team: Team | null;
   role: PersonnelRole;
   status: Status;
+  customRole: string | null;
   totalNumberOfOperations: number;
   totalEmergencyCases: number;
   totalTransportCases: number;
@@ -22,9 +23,16 @@ export interface CrewResponse {
 export async function GET(): Promise<NextResponse> {
   const crews = await prisma.personnel.findMany({
     where: {
-      OR: [
-        { role: PersonnelRole.CREW },
-        { role: PersonnelRole.BOTH },
+      AND: [
+        {
+          OR: [
+            { role: PersonnelRole.CREW },
+            { role: PersonnelRole.BOTH },
+          ],
+        },
+        {
+          status: "ACTIVE",
+        },
       ],
     },
     select: {
@@ -32,7 +40,9 @@ export async function GET(): Promise<NextResponse> {
       name: true,
       team: true,
       role: true,
+      customRole: true,
       status: true,
+
       recordsAsCrew: {
         select: {
           record: {
@@ -68,6 +78,7 @@ export async function GET(): Promise<NextResponse> {
       name: person.name,
       team: person.team,
       role: person.role,
+      customRole: person.customRole,
       status: person.status,
       totalNumberOfOperations,
       totalEmergencyCases,

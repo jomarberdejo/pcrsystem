@@ -28,6 +28,7 @@ model Personnel {
   id              String        @id @default(uuid()) @db.Uuid
   name            String
   role            PersonnelRole
+  customRole      String?
   team            Team?
   status          Status        @default(ACTIVE)
   archivedAt      String?
