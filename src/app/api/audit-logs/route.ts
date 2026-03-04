@@ -13,7 +13,7 @@ export async function GET(): Promise<NextResponse> {
         orderBy: {
             timestamp: "desc",
         },
-        take: 150,
+        take: 1000,
         include: {
             performedByAdmin: true
         }
