@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 
 const getPCRData = async (): Promise<PCRReportType[]> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pcr`, {
-    next: { revalidate: 60 },
+    // next: { revalidate: 60 },
+    cache: "no-store",
   });
 
   if (!res.ok) throw new Error("Failed to fetch PCR data");
