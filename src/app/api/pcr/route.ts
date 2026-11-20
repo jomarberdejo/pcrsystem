@@ -32,10 +32,12 @@ export async function GET() {
       ambulanceCrews: {
         include: { crew: true },
       },
+
     },
     orderBy: {
       date: 'desc',
     },
+    take: 1000,
   });
 
   const updatedData = records.map((report) => {
